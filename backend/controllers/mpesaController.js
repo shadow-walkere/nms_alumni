@@ -3,133 +3,108 @@ import Donation from "../models/Donation.js";
 import { getAccessToken, generatePassword } from "../config/mpesa.js";
 
 /* ───────── STK PUSH ───────── */
+// export const stkPush = async (req, res) => {
+//   try {
+//     console.log("STK HIT ✅");
+
+//     const { name, email, phone, amount, purpose } = req.body;
+
+//     const token = await getAccessToken();
+//     const { password, timestamp } = generatePassword();
+
+//     const response = await axios.post(
+//       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+//       {
+//         BusinessShortCode: process.env.SHORTCODE,
+//         Password: password,
+//         Timestamp: timestamp,
+//         TransactionType: "CustomerPayBillOnline",
+//         Amount: amount,
+//         PartyA: phone,
+//         PartyB: process.env.SHORTCODE,
+//         PhoneNumber: phone,
+//         CallBackURL: process.env.CALLBACK_URL,
+//         AccountReference: "NMS Alumni",
+//         TransactionDesc: "Donation",
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+//     // Save donation
+//     await Donation.create({
+//       name,
+//       email,
+//       phone,
+//       amount,
+//       purpose,
+//       checkoutRequestID: response.data.CheckoutRequestID,
+//     });
+
+//     res.json({
+//       message: "STK Push sent",
+//       data: response.data,
+//     });
+
+//   } catch (err) {
+//     console.error("ERROR:", err.response?.data || err.message);
+//     res.status(500).json({
+//       error: err.response?.data || err.message,
+//     });
+//   }
+// };
+
 export const stkPush = async (req, res) => {
   try {
-    const { name, phone, amount, purpose } = req.body;
+    const { phone, amount } = req.body;
 
-    // Validate required fields
     if (!phone || !amount) {
-      return res.status(400).json({ error: "Phone and amount are required" });
+      return res.status(400).json({ error: "Phone and amount required" });
     }
 
-    // Format phone to Kenya standard (2547XXXXXXXX)
-    const formattedPhone = phone.startsWith("0")
-      ? "254" + phone.slice(1)
-      : phone.startsWith("254")
-      ? phone
-      : "254" + phone;
+    console.log("STK PUSH REQUEST:", phone, amount);
 
-    // Generate STK Push password
-    const token = await getAccessToken();
-console.log("Access Token:", token);
-    const { password, timestamp } = generatePassword();
-
-    // Save donation as pending
-    const donation = await Donation.create({
-      name,
-      phone: formattedPhone,
-      amount,
-      purpose,
-      status: "Pending",
+    // 🔥 TEMP TEST RESPONSE
+    return res.json({
+      message: "STK Push simulated successfully",
     });
 
-    // Make STK Push request
-    const stkResponse = await axios.post(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-      {
-        BusinessShortCode: process.env.SHORTCODE,
-        Password: password,
-        Timestamp: timestamp,
-        TransactionType: "CustomerPayBillOnline",
-        Amount: amount,
-        PartyA: formattedPhone,
-        PartyB: process.env.SHORTCODE,
-        PhoneNumber: formattedPhone,
-        CallBackURL: process.env.CALLBACK_URL,
-        AccountReference: "NMS Alumni",
-        TransactionDesc: "Donation",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    // Respond with checkout ID and full M-Pesa response
-    res.json({
-      message: "STK Push sent successfully",
-      checkoutRequestID: stkResponse.data.CheckoutRequestID,
-      data: stkResponse.data,
-    });
   } catch (error) {
-    console.error(
-      "STK ERROR:",
-      error.response?.data || error.message || error
-    );
-    res.status(500).json({
-      error: "Failed to initiate STK Push",
-      details: error.response?.data || error.message,
-    });
+    console.error("MPESA ERROR:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 /* ───────── CALLBACK ───────── */
 export const mpesaCallback = async (req, res) => {
   try {
-    const callback = req.body;
+    console.log("CALLBACK RECEIVED 🔔");
 
-    console.log("🟢 M-Pesa Callback Received:", JSON.stringify(callback, null, 2));
+    const data = req.body;
 
-    const stkCallback = callback.Body?.stkCallback;
-    if (!stkCallback) {
-      console.warn("⚠️ No stkCallback found in request body");
-      return res.sendStatus(200); // Respond 200 to prevent retries
-    }
+    const stk = data.Body.stkCallback;
 
-    const { ResultCode, ResultDesc, CheckoutRequestID } = stkCallback;
+    if (stk.ResultCode === 0) {
+      const metadata = stk.CallbackMetadata.Item;
 
-    // If transaction failed, log and return
-    if (ResultCode !== 0) {
-      console.warn(`❌ Transaction failed: ${ResultDesc} (Code: ${ResultCode})`);
-      return res.sendStatus(200);
-    }
+      const receipt = metadata.find(i => i.Name === "MpesaReceiptNumber")?.Value;
 
-    // Extract metadata
-    const metadata = stkCallback.CallbackMetadata?.Item || [];
-    const receipt = metadata.find((i) => i.Name === "MpesaReceiptNumber")?.Value;
-    const amount = metadata.find((i) => i.Name === "Amount")?.Value;
-    const phone = metadata.find((i) => i.Name === "PhoneNumber")?.Value;
-
-    if (!receipt || !amount || !phone) {
-      console.warn("⚠️ Missing required fields in callback metadata");
-      return res.sendStatus(200);
-    }
-
-    // Update the donation in DB
-    const donation = await Donation.findOneAndUpdate(
-      { phone, amount, status: "Pending" },
-      {
-        status: "Completed",
-        mpesaReceipt: receipt,
-        checkoutID: CheckoutRequestID,
-        completedAt: new Date(),
-      },
-      { new: true }
-    );
-
-    if (!donation) {
-      console.warn(
-        `⚠️ No pending donation found for phone ${phone} and amount ${amount}`
+      await Donation.findOneAndUpdate(
+        { checkoutRequestID: stk.CheckoutRequestID },
+        {
+          status: "Completed",
+          mpesaReceipt: receipt,
+        }
       );
-    } else {
-      console.log(`✅ Donation updated. Receipt: ${receipt}, Amount: ${amount}`);
     }
 
-    // Respond 200 OK to M-Pesa
     res.sendStatus(200);
-  } catch (error) {
-    console.error("🔥 CALLBACK ERROR:", error);
-    res.sendStatus(500); // M-Pesa retries if 500
+
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
   }
 };

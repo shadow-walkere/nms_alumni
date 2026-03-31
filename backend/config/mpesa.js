@@ -1,31 +1,32 @@
-import axios from "axios";
-import dotenv from "dotenv";
+
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-/* GET ACCESS TOKEN */
-export async function getAccessToken() {
-  const url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+const config = {
+    consumerKey: process.env.MPESA_CONSUMER_KEY,
+    consumerSecret: process.env.MPESA_CONSUMER_SECRET,
+    passkey: process.env.MPESA_PASSKEY,
+    shortCode: process.env.MPESA_SHORTCODE,
+    callbackUrl: process.env.MPESA_CALLBACK_URL || 'https:5000/api/mpesa/callback',
+    environment: 'sandbox' // or 'production'
+};
 
-  const auth = Buffer.from(`${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`).toString("base64");
-
-  const res = await axios.get(url, {
-    headers: {
-      Authorization: `Basic ${auth}`,
-    },
-  });
-
-  return res.data.access_token;
+// ✅ Validate on startup
+if (!config.consumerKey || !config.consumerSecret) {
+    console.error('❌ FATAL: M-Pesa credentials not loaded from .env');
+    console.error('   Make sure you have:');
+    console.error('   - MPESA_CONSUMER_KEY');
+    console.error('   - MPESA_CONSUMER_SECRET');
+    console.error('   - MPESA_PASSKEY');
+    console.error('   - MPESA_SHORTCODE');
+    process.exit(1);
 }
 
-/* GENERATE PASSWORD */
-export function generatePassword() {
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[^0-9]/g, "")
-    .slice(0, 14);
-  const password = Buffer.from(
-    process.env.SHORTCODE + process.env.PASSKEY + timestamp,
-  ).toString("base64");
-  return { password, timestamp };
-}
+console.log('✅ M-Pesa config loaded:', {
+    consumerKey: config.consumerKey?.slice(0, 5) + '...',
+    consumerSecret: config.consumerSecret?.slice(0, 5) + '...',
+    shortCode: config.shortCode
+});
+
+export default config;
