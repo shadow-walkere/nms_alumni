@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-// --- MOCK DATA FOR SLIDER ---
+
 const featuredContent = [
   {
     id: 1,
@@ -179,7 +179,7 @@ export default function Home() {
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500 to-amber-600 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
           <img
-            src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop"
+            src="../Assets/NMS-10.jpg"
             alt="Students on campus"
             className="relative rounded-xl shadow-2xl object-cover h-[400px] w-full border border-zinc-800"
           />

@@ -1,51 +1,95 @@
-const express = require("express");
-// const bcrypt = require("bcrypt");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const Admin = require("../models/Admin");
-const authenticateToken = require("../authToken"); // Assuming authenticateToken is your middleware to verify JWT
+import express from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-const router = express.Router(); // Create the router instance
+// ⚠️ CRITICAL: When using ES6 imports in Node.js for your own files, 
+// you MUST include the .js extension at the end!
+import User from '../models/User.js'; 
 
-  // Admin login route
-  router.post("/login", async (req, res) => {
-    const { username, password } = req.body;
+const router = express.Router();
 
-    if (!username || !password) {
-      return res.status(400).json({ message: "Please provide username and password" });
-    }
-
-    try {
-      const admin = await Admin.findOne({ username: username });
-      if (!admin) {
-        return res.status(401).json({ message: "Invalid username or password" });
-      }
-
-      const isMatch = await bcrypt.compare(password, admin.password);
-      if (!isMatch) {
-        return res.status(401).json({ message: "Invalid username or password" });
-      }
-
-      const token = jwt.sign({ id: admin._id, role: "admin" }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
-
-      res.status(200).json({ message: "Login successful", token });
-    } catch (error) {
-      res.status(500).json({ message: "Server error", error: error.message });
-    }
-  });
-
-// Admin Dashboard route
-router.get("/admin-dashboard", authenticateToken, async (req, res) => {
+// ==========================================
+// 1. TEMPORARY ROUTE: Create the first admin
+// ==========================================
+router.post('/register-admin', async (req, res, next) => {
   try {
-    if (req.user.role !== "admin") {
-      return res.status(403).json({ message: "Access denied: Admins only" });
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required.' });
     }
-    res.status(200).json({ message: "Welcome to the admin dashboard" });
-  } catch (error) {
-    res.status(500).json({ message: "Error accessing admin dashboard", error: error.message });
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash the password (CRITICAL for login to work later)
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Save the new admin to MongoDB
+    const newAdmin = new User({
+      username: username,
+      password: hashedPassword,
+      role: 'admin' // Ensure your User model supports this, or remove it if not
+    });
+
+    await newAdmin.save();
+    res.status(201).json({ message: "Admin created successfully! You can now log in." });
+    
+  } catch (err) {
+    console.error("Registration Error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-module.exports = router;
+
+// ==========================================
+// 2. POST /api/admin/login
+// Admin Login route
+// ==========================================
+router.post('/login', async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Username and password are required.' });
+    }
+
+    const user = await User.findOne({ 
+      username: { $regex: new RegExp(`^${username}$`, "i") } 
+    });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+
+    // Sign the JWT payload
+    const token = jwt.sign(
+      { id: user._id, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' } // Token expires in 1 day
+    );
+
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        role: user.role
+      }
+    });
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+export default router;

@@ -22,9 +22,11 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Home", path: "/" },
-    { name: "Directory", path: "/alumni" },
+    { name: "About Us", path: "/about" },
     { name: "News & Events", path: "/events" },
     { name: "Contact Us", path: "/contact" },
+    { name: "Gallery", path: "/Gallery" },
+    { name: "Alumni Direcory", path: "/Alumni Directory" },
   ];
 
   const isActive = (path) => location.pathname === path;
