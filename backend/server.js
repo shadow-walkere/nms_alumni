@@ -7,7 +7,8 @@ import User from "./models/User.js";
 
 // --- ROUTE IMPORTS ---
 import mpesaRoutes from "./routes/mpesaRoutes.js"; // ✅ MUST EXIST
-import adminAuthRoutes from "./routes/AdminAuth.js"; // 👈 Add your auth routes here
+import adminAuthRoutes from "./routes/AdminAuth.js"; 
+
 
 dotenv.config();
 
@@ -64,7 +65,8 @@ mongoose.connect(process.env.MONGO_URI)
  * ROUTES
  * ----------------------------------- */
 app.use("/api/mpesa", mpesaRoutes);
-app.use("/api/admin", adminAuthRoutes); // ✅ Restore Admin Auth routes
+app.use("/api/admin", adminAuthRoutes);
+// ✅ Restore Admin Auth routes
 
 // Catch-all for 404s
 app.use((req, res) => {

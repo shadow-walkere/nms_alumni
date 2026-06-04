@@ -16,8 +16,7 @@ import AlumniDirectory from "./page/AlumniDirectory";
 import Opportunities from "./page/mentorships";
 
 // --- ADMIN COMPONENTS ---
-// Make sure these paths match where you saved the files
-import AdminLogin from "./Admin/AdminLogin"; 
+import AdminLogin from "./Admin/AdminLogin";
 import AdminDashboard from "./Admin/AdminDashboard";
 import ManageGallery from "./Admin/ManageGallery";
 import UsersDetails from "./Admin/UserDetails";
@@ -25,34 +24,33 @@ import AdminFAQs from "./Admin/AdminFAQs";
 import AdminTestimonials from "./Admin/AdminTestimonials";
 
 /* ─────────────────────────────────────────────────────────
- * PROTECTED ROUTE WRAPPERS
+ * PROTECTED ROUTES
  * ───────────────────────────────────────────────────────── */
 
-/* 1. Regular User Protected Route */
 function ProtectedRoute({ children }) {
   const user = localStorage.getItem("user");
+
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
+
   return children;
 }
 
-/* 2. Admin Protected Route */
 function AdminProtectedRoute({ children }) {
   const adminToken = localStorage.getItem("adminToken");
+
   if (!adminToken) {
     return <Navigate to="/admin" replace />;
   }
+
   return children;
 }
 
 /* ─────────────────────────────────────────────────────────
- * LAYOUT WRAPPERS
+ * LAYOUT
  * ───────────────────────────────────────────────────────── */
 
-/* * Public Layout Wraps the standard app with Navbar and Footer.
- * This prevents the Navbar/Footer from rendering on the Admin pages.
- */
 function PublicLayout() {
   return (
     <div className="bg-black min-h-screen flex flex-col selection:bg-yellow-500 selection:text-black">
@@ -66,7 +64,7 @@ function PublicLayout() {
 }
 
 /* ─────────────────────────────────────────────────────────
- * MAIN APP ROUTER
+ * APP
  * ───────────────────────────────────────────────────────── */
 
 function App() {
@@ -75,45 +73,20 @@ function App() {
       <ScrollToTop />
 
       <Routes>
-        {/* =========================================
-            PUBLIC APP (Uses Navbar & Footer)
-            ========================================= */}
+        {/* PUBLIC ROUTES */}
         <Route element={<PublicLayout />}>
-          
-          {/* Public Routes */}
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/donations" element={<Donations />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutUs />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/events" element={<NewsEvents />} />
+          <Route path="/alumni-directory" element={<AlumniDirectory />} />
 
-          {/* User Protected Routes */}
+          {/* Example protected user route */}
           <Route
-            path="/gallery"
-            element={
-              <ProtectedRoute>
-                <Gallery />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/events"
-            element={
-              <ProtectedRoute>
-                <NewsEvents />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/alumni-directory"
-            element={
-              <ProtectedRoute>
-                <AlumniDirectory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/mentorships"
+            path="/opportunities"
             element={
               <ProtectedRoute>
                 <Opportunities />
@@ -122,14 +95,10 @@ function App() {
           />
         </Route>
 
-        {/* =========================================
-            ADMIN PORTAL (Standalone Fullscreen Layouts)
-            ========================================= */}
-            
-        {/* Admin Login Page */}
+        {/* ADMIN LOGIN */}
         <Route path="/admin" element={<AdminLogin />} />
 
-        {/* Admin Dashboard & Nested Routes */}
+        {/* ADMIN DASHBOARD */}
         <Route
           path="/admin/*"
           element={
@@ -144,7 +113,6 @@ function App() {
           <Route path="faqs" element={<AdminFAQs />} />
           <Route path="testimonials" element={<AdminTestimonials />} />
         </Route>
-
       </Routes>
     </BrowserRouter>
   );

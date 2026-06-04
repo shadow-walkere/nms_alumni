@@ -1,12 +1,35 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Send } from "lucide-react";
 import { toast } from "react-hot-toast";
+
+/* ─── Custom Scroll‑Reveal Hook ─── */
+const useScrollReveal = (threshold = 0.1) => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+          }
+        });
+      },
+      { threshold, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    const elements = document.querySelectorAll("[data-reveal]");
+    elements.forEach((el) => observer.observe(el));
+
+    return () => elements.forEach((el) => observer.unobserve(el));
+  }, [threshold]);
+};
 
 export default function Contact() {
   const formRef = useRef();
   const [status, setStatus] = useState({ type: "", message: "" });
   const [loading, setLoading] = useState(false);
+
+  useScrollReveal(); // activate scroll‑triggered reveals
 
   const sendEmail = async (e) => {
     e.preventDefault();
@@ -25,9 +48,7 @@ export default function Contact() {
         `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/contact/send-mail`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         }
       );
@@ -61,16 +82,17 @@ export default function Contact() {
   };
 
   return (
-    <div className="relative min-h-screen bg-black text-gray-300 font-sans selection:bg-yellow-500 selection:text-black">
-      
-      {/* 🌟 Hero Section */}
+    <div className="relative min-h-screen bg-black text-gray-300 font-sans selection:bg-yellow-500 selection:text-black overflow-hidden">
+      {/* ========== HERO SECTION ========== */}
       <section className="relative h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden border-b border-yellow-500/20">
         <img
-          src="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?q=80&w=2070&auto=format&fit=crop"
+          src="../Assets/reunion.jpg"
           alt="Contact Us"
           className="absolute inset-0 w-full h-full object-cover object-center opacity-40"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-black"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-black" />
+        {/* ambient light */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl animate-pulse" />
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -78,7 +100,7 @@ export default function Contact() {
           transition={{ duration: 1 }}
           className="relative z-10 text-center text-white px-6"
         >
-          <span className="inline-block border border-yellow-500 text-yellow-500 text-xs px-4 py-1.5 rounded-full font-bold tracking-widest uppercase mb-6 shadow-[0_0_10px_rgba(234,179,8,0.2)]">
+          <span className="inline-block border border-yellow-500/30 bg-yellow-500/10 backdrop-blur-md text-yellow-500 text-xs px-4 py-1.5 rounded-full font-bold tracking-widest uppercase mb-6 shadow-[0_0_20px_rgba(234,179,8,0.15)]">
             We're Here For You
           </span>
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-wide drop-shadow-lg mb-4">
@@ -90,12 +112,12 @@ export default function Contact() {
         </motion.div>
       </section>
 
-      {/* 🕰️ Info Bar */}
+      {/* ========== INFO BAR ========== */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.8 }}
-        className="bg-zinc-950 border-b border-zinc-900 text-white flex flex-wrap justify-center items-center gap-6 md:gap-12 py-6 px-4 text-center text-sm md:text-base font-medium relative z-20"
+        className="relative z-20 bg-zinc-950 border-b border-white/5 text-white flex flex-wrap justify-center items-center gap-6 md:gap-12 py-6 px-4 text-sm md:text-base font-medium"
       >
         <div className="flex items-center gap-3">
           <MapPin className="w-5 h-5 text-yellow-500" />
@@ -117,29 +139,21 @@ export default function Contact() {
           <Mail className="w-5 h-5 text-yellow-500" />
           <span>alumni@nambalemagnet.org</span>
         </a>
-        {/* <div className="flex items-center gap-3">
-          <Clock className="w-5 h-5 text-yellow-500" />
-          <span className="text-gray-300">Mon - Fri: 8 AM - 5 PM</span>
-        </div> */}
       </motion.section>
 
-      {/* 🌸 Main Contact Section */}
-      <section className="px-6 py-20 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 gap-12 lg:gap-16 items-start"
-        >
-          {/* ✉️ Contact Form */}
+      {/* ========== MAIN CONTACT SECTION ========== */}
+      <section className="px-6 py-24 max-w-7xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-start">
+          {/* ✉️ Contact Form Card */}
           <motion.div
-            whileHover={{ scale: 1.01 }}
-            transition={{ duration: 0.3 }}
-            className="relative bg-zinc-950 border border-zinc-800 p-8 md:p-10 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.8)] overflow-hidden"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="relative rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm p-8 md:p-10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden"
           >
-            {/* Subtle glow effect */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-bl-full blur-2xl pointer-events-none"></div>
+            {/* subtle glow */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-bl-full blur-2xl pointer-events-none" />
 
             <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
               <Send className="w-6 h-6 text-yellow-500" />
@@ -148,7 +162,7 @@ export default function Contact() {
 
             <form ref={formRef} onSubmit={sendEmail} className="space-y-6 relative z-10">
               {["name", "email"].map((field, i) => (
-                <div className="relative" key={i}>
+                <div key={i}>
                   <label className="text-xs uppercase tracking-widest font-bold text-gray-500 ml-1 mb-2 block">
                     {field === "name" ? "Full Name" : "Email Address"}
                   </label>
@@ -157,13 +171,13 @@ export default function Contact() {
                     name={field}
                     required
                     disabled={loading}
-                    className="w-full px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed placeholder-zinc-600"
+                    className="w-full px-5 py-4 bg-white/5 border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder={`Enter your ${field}`}
                   />
                 </div>
               ))}
 
-              <div className="relative">
+              <div>
                 <label className="text-xs uppercase tracking-widest font-bold text-gray-500 ml-1 mb-2 block">
                   Your Message
                 </label>
@@ -172,7 +186,7 @@ export default function Contact() {
                   name="message"
                   required
                   disabled={loading}
-                  className="w-full px-5 py-4 bg-zinc-900 border border-zinc-800 rounded-xl text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed placeholder-zinc-600 resize-none"
+                  className="w-full px-5 py-4 bg-white/5 border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed resize-none"
                   placeholder="How can we help you?"
                 ></textarea>
               </div>
@@ -182,7 +196,7 @@ export default function Contact() {
                 whileTap={!loading ? { scale: 0.98 } : {}}
                 type="submit"
                 disabled={loading}
-                className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold px-6 py-4 rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(234,179,8,0.2)] flex justify-center items-center gap-2"
+                className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold px-6 py-4 rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(234,179,8,0.3)] flex justify-center items-center gap-2"
               >
                 {loading ? (
                   <>
@@ -195,7 +209,6 @@ export default function Contact() {
               </motion.button>
             </form>
 
-            {/* Status Messages */}
             {status.message && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -211,7 +224,7 @@ export default function Contact() {
             )}
           </motion.div>
 
-          {/* 🗺️ Contact Info + Map */}
+          {/* 🗺️ Contact Info & Map */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -219,53 +232,43 @@ export default function Contact() {
             viewport={{ once: true }}
             className="flex flex-col h-full justify-between"
           >
-            <div>
-              <h2 className="text-3xl font-extrabold text-white mb-6">
+            <div data-reveal>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6">
                 Visit or <span className="text-yellow-500">Call Us</span>
               </h2>
-              <div className="w-16 h-1 bg-yellow-500 mb-6"></div>
+              <div className="w-16 h-1 bg-yellow-500 mb-8" />
               <p className="text-gray-400 mb-10 leading-relaxed text-lg">
                 The Alumni Association office is open during regular school hours. Reach out to coordinate campus visits, organize reunions, or inquire about the Endowment Fund. We are always thrilled to welcome our alumni back home.
               </p>
 
               <div className="space-y-6">
-                {/* Custom Styled Info Blocks */}
-                <div className="flex items-start gap-4 group">
-                  <div className="bg-zinc-900 p-4 rounded-xl text-yellow-500 group-hover:bg-yellow-500 group-hover:text-black transition-colors">
-                    <MapPin className="w-6 h-6" />
+                {[
+                  { icon: MapPin, title: "Our Location", content: "Nambale Magnet School Campus\nBusia County, Kenya" },
+                  { icon: Phone, title: "Phone Number", content: "+254 700 000 000", href: "tel:+254700000000" },
+                  { icon: Mail, title: "Email Address", content: "alumni@nambalemagnet.org", href: "mailto:alumni@nambalemagnet.org" },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-4 group">
+                    <div className="p-4 rounded-xl bg-white/5 border border-white/5 text-yellow-500 group-hover:bg-yellow-500 group-hover:text-black group-hover:border-yellow-500 transition-all duration-300">
+                      <item.icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold mb-1">{item.title}</h4>
+                      {item.href ? (
+                        <a href={item.href} className="text-gray-400 text-sm hover:text-yellow-500 transition-colors">
+                          {item.content}
+                        </a>
+                      ) : (
+                        <p className="text-gray-400 text-sm whitespace-pre-line">{item.content}</p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-bold mb-1">Our Location</h4>
-                    <p className="text-gray-500 text-sm">Nambale Magnet School Campus<br/>Busia County, Kenya</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 group">
-                  <div className="bg-zinc-900 p-4 rounded-xl text-yellow-500 group-hover:bg-yellow-500 group-hover:text-black transition-colors">
-                    <Phone className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-bold mb-1">Phone Number</h4>
-                    <a href="tel:+254700000000" className="text-gray-500 text-sm hover:text-yellow-500 transition-colors">+254 700 000 000</a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4 group">
-                  <div className="bg-zinc-900 p-4 rounded-xl text-yellow-500 group-hover:bg-yellow-500 group-hover:text-black transition-colors">
-                    <Mail className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-white font-bold mb-1">Email Address</h4>
-                    <a href="mailto:alumni@nambalemagnet.org" className="text-gray-500 text-sm hover:text-yellow-500 transition-colors">alumni@nambalemagnet.org</a>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            {/* Map Embed - Styled for Dark Mode */}
-            <div className="mt-12 w-full h-64 relative rounded-2xl overflow-hidden border border-zinc-800 group shadow-2xl">
-              {/* Overlay to dim the map slightly to fit the dark theme */}
-              <div className="absolute inset-0 bg-black/20 pointer-events-none z-10 transition-opacity group-hover:opacity-0"></div>
+            {/* Map */}
+            <div className="mt-12 w-full h-64 relative rounded-2xl overflow-hidden border border-white/5 group shadow-2xl" data-reveal>
+              <div className="absolute inset-0 bg-black/20 pointer-events-none z-10 transition-opacity group-hover:opacity-0" />
               <iframe
                 title="Nambale Magnet School Location"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.818228511475!2d34.2505!3d0.4503!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177f590000000001%3A0x1234567890abcdef!2sNambale%20Magnet%20School!5e0!3m2!1sen!2ske!4v1610000000000!5m2!1sen!2ske"
@@ -283,7 +286,7 @@ export default function Contact() {
                 className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-all z-20 backdrop-blur-sm"
               >
                 <a
-                  href="https://goo.gl/maps/placeholder"
+                  href="https://maps.app.goo.gl/KcYUstCPLWN9SS1y8"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold px-8 py-3 rounded-full shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-transform hover:scale-105"
@@ -293,10 +296,10 @@ export default function Contact() {
               </motion.div>
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* 💬 Floating WhatsApp Button - Styled for the theme */}
+      {/* ========== FLOATING WHATSAPP BUTTON ========== */}
       <motion.a
         href="https://wa.me/254700000000?text=Hello%20NMS%20Alumni%20Network!%20I%20have%20an%20inquiry."
         target="_blank"
@@ -305,9 +308,8 @@ export default function Contact() {
         whileHover={{ scale: 1.1 }}
       >
         <div className="relative">
-          {/* Gold Pulse Effect */}
-          <span className="absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-40 animate-ping"></span>
-          <div className="relative bg-zinc-900 border border-yellow-500/50 rounded-full p-4 shadow-[0_0_20px_rgba(234,179,8,0.3)] group-hover:bg-yellow-500 transition-colors">
+          <span className="absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-40 animate-ping" />
+          <div className="relative bg-zinc-900 border border-yellow-500/40 rounded-full p-4 shadow-[0_0_20px_rgba(234,179,8,0.3)] group-hover:bg-yellow-500 transition-all duration-300">
             <svg
               className="w-8 h-8 text-yellow-500 group-hover:text-black transition-colors"
               fill="currentColor"
@@ -319,6 +321,19 @@ export default function Contact() {
           </div>
         </div>
       </motion.a>
+
+      {/* ========== GLOBAL SCROLL REVEAL STYLES ========== */}
+      <style>{`
+        [data-reveal] {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        [data-reveal].revealed {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      `}</style>
     </div>
   );
 }
