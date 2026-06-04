@@ -1,16 +1,99 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
-import User from "./models/User.js";
+// import express from "express";
+// import dotenv from "dotenv";
+// import cors from "cors";
+// import mongoose from "mongoose";
+// import bcrypt from "bcryptjs";
+// import User from "./models/User.js";
 
-// --- ROUTE IMPORTS ---
-import mpesaRoutes from "./routes/mpesaRoutes.js"; // ✅ MUST EXIST
-import adminAuthRoutes from "./routes/AdminAuth.js"; 
+// // --- ROUTE IMPORTS ---
+// import mpesaRoutes from "./routes/mpesaRoutes.js"; 
+// import AdminRoute from "../src/Admin/AdminRoute.jsx"; 
+// import { AdminRoutes } from "../src/Admin/AdminDashboard.jsx";
 
 
-dotenv.config();
+// dotenv.config();
+
+// const app = express();
+
+// // Middleware
+// app.use(cors());
+// app.use(express.json());
+
+// // 🕵️ DEBUGGING MIDDLEWARE
+// app.use((req, res, next) => {
+//   console.log(`[${req.method}] ${req.url}`);
+//   next();
+// });
+
+// // Base Route
+// app.get("/", (req, res) => {
+//   res.send("Backend API is running successfully! 🚀");
+// });
+
+// /* DB */
+// mongoose.connect(process.env.MONGO_URI)
+//   .then(async () => {
+//     console.log("✅ MongoDB Connected");
+//     try {
+//       const adminUsername = process.env.ADMIN_USERNAME || "Admin";
+//       const adminPassword = process.env.ADMIN_PASSWORD || "Admin@1234";
+
+//       // Case-insensitive query to see if admin already exists
+//       const adminExists = await User.findOne({ 
+//         username: { $regex: new RegExp(`^${adminUsername}$`, "i") } 
+//       });
+
+//       if (!adminExists) {
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(adminPassword, salt);
+
+//         await User.create({
+//           username: adminUsername,
+//           password: hashedPassword,
+//           role: "admin"
+//         });
+//         console.log(`✅ Default admin created (username: ${adminUsername})`);
+//       } else {
+//         console.log("ℹ️ Admin user already exists in database.");
+//       }
+//     } catch (seedErr) {
+//       console.error("❌ Failed to seed default admin:", seedErr);
+//     }
+//   })
+//   .catch(err => console.error("❌ MongoDB Connection Error:", err));
+
+// /* -----------------------------------
+//  * ROUTES
+//  * ----------------------------------- */
+// app.use("/api/mpesa", mpesaRoutes);
+// app.use("/api/admin", AdminRoutes);
+// // ✅ Restore Admin Auth routes
+
+// // Catch-all for 404s
+// app.use((req, res) => {
+//   res.status(404).json({ error: `Route ${req.originalUrl} not found on this server.` });
+// });
+
+// const PORT = process.env.PORT || 5000;
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on http://localhost:${PORT}`);
+// });
+// // Trigger reload: 1
+
+
+
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const bcrypt = require('bcryptjs');
+
+// Models
+const Admin = require('./models/Admin');
+
+// Route Files
+// const authRoutes = require('./routes/auth'); 
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -18,63 +101,51 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🕵️ DEBUGGING MIDDLEWARE
-app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.url}`);
-  next();
-});
+// Mount Routes
+// app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 
-// Base Route
-app.get("/", (req, res) => {
-  res.send("Backend API is running successfully! 🚀");
-});
-
-/* DB */
+// Database Connection & Initial Setup
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
-    console.log("✅ MongoDB Connected");
-    try {
-      const adminUsername = process.env.ADMIN_USERNAME || "Admin";
-      const adminPassword = process.env.ADMIN_PASSWORD || "Admin@1234";
+    console.log('MongoDB successfully connected');
+    
+    // Automatic Admin Creation
+    const adminUsername = process.env.ADMIN_USERNAME || 'Admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@1234';
 
-      // Case-insensitive query to see if admin already exists
-      const adminExists = await User.findOne({ 
-        username: { $regex: new RegExp(`^${adminUsername}$`, "i") } 
+    // Case-insensitive check to see if admin already exists
+    const adminExists = await Admin.findOne({
+      username: { $regex: new RegExp(`^${adminUsername}$`, 'i') }
+    });
+
+    if (!adminExists) {
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      await Admin.create({
+        username: adminUsername,
+        password: hashedPassword
       });
-
-      if (!adminExists) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(adminPassword, salt);
-
-        await User.create({
-          username: adminUsername,
-          password: hashedPassword,
-          role: "admin"
-        });
-        console.log(`✅ Default admin created (username: ${adminUsername})`);
-      } else {
-        console.log("ℹ️ Admin user already exists in database.");
+      console.log(`⚠️ Default Admin created! Username: ${adminUsername}`);
+    } else {
+      let updated = false;
+      if (adminExists.username !== adminUsername) {
+        adminExists.username = adminUsername;
+        updated = true;
       }
-    } catch (seedErr) {
-      console.error("❌ Failed to seed default admin:", seedErr);
+      const isMatch = await bcrypt.compare(adminPassword, adminExists.password);
+      if (!isMatch) {
+        adminExists.password = await bcrypt.hash(adminPassword, 10);
+        updated = true;
+      }
+      if (updated) {
+        await adminExists.save();
+        console.log(`✅ Admin credentials updated to match .env for username: ${adminUsername}`);
+      }
     }
   })
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
+  .catch((err) => console.error('MongoDB connection error:', err));
 
-/* -----------------------------------
- * ROUTES
- * ----------------------------------- */
-app.use("/api/mpesa", mpesaRoutes);
-app.use("/api/admin", adminAuthRoutes);
-// ✅ Restore Admin Auth routes
-
-// Catch-all for 404s
-app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.originalUrl} not found on this server.` });
-});
-
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
-// Trigger reload: 1

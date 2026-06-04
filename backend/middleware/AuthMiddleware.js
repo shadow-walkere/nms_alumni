@@ -1,80 +1,68 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+// const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-
-// Middleware: verify token and set `req.user`
-const authenticate = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-password");
-
-    if (!user) return res.status(401).json({ message: "Unauthorized" });
-
-    req.user = user; // Attach user to request
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-};
-
-// Middleware: check if user is admin
-const isAdmin = (req, res, next) => {
-  if (!req.user?.isAdmin) {
-    return res.status(403).json({ message: "Access denied: Admins only" });
-  }
-  next();
-};
-
-module.exports = { authenticate, isAdmin };
-
-// middleware/AuthMiddleware.js
-
-// const jwt = require("jsonwebtoken");
-// const User = require("../models/User");
-
-// const USER_SECRET = process.env.USER_JWT_SECRET || "user-secret";
-// const ADMIN_SECRET = process.env.ADMIN_JWT_SECRET || "admin-secret";
-
-// // Try to verify with both secrets
-// const authenticate = async (req, res, next) => {
-//   const authHeader = req.headers.authorization;
-//   if (!authHeader?.startsWith("Bearer ")) {
-//     return res.status(401).json({ message: "Unauthorized" });
-//   }
-
-//   const token = authHeader.split(" ")[1];
-
+// const adminAuth = (req, res, next) => {
 //   try {
-//     let decoded;
-//     try {
-//       decoded = jwt.verify(token, ADMIN_SECRET);
-//     } catch {
-//       decoded = jwt.verify(token, USER_SECRET);
+//     // Check if the authorization header exists
+//     const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+//     if (!token) {
+//       return res.status(401).json({ message: 'Access denied. No token provided.' });
 //     }
 
-//     const user = await User.findById(decoded.id).select("-password");
-//     if (!user) return res.status(401).json({ message: "User not found" });
-
-//     req.user = user;
+//     // Verify token
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+//     // Attach the admin data to the request object
+//     req.admin = decoded;
 //     next();
-//   } catch (err) {
-//     return res.status(401).json({ message: "Invalid token" });
+//   } catch (error) {
+//     res.status(401).json({ message: 'Invalid or expired token.' });
 //   }
 // };
 
-// const isAdmin = (req, res, next) => {
-//   if (!req.user?.isAdmin) {
-//     return res.status(403).json({ message: "Access denied: Admins only" });
-//   }
-//   next();
-// };
+// module.exports = adminAuth;
 
-// module.exports = { authenticate, isAdmin };
+
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const Admin = require('../models/Admin');
+
+const router = express.Router();
+
+// @route   POST /api/admin/login
+// @desc    Authenticate admin and get token
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // 1. Check if admin exists
+    const admin = await Admin.findOne({ username });
+    if (!admin) {
+      return res.status(401).json({ message: 'Invalid username or password' });
+    }
+
+    // 2. Validate password
+    const isMatch = await bcrypt.compare(password, admin.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid username or password' });
+    }
+
+    // 3. Create and return JWT Token
+    const token = jwt.sign(
+      { id: admin._id, role: 'admin' },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      message: 'Login successful',
+      token
+    });
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({ message: 'Server error during login' });
+  }
+});
+
+module.exports = router;

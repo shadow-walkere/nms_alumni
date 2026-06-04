@@ -1,3 +1,4 @@
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 
 // --- PUBLIC COMPONENTS ---
@@ -12,25 +13,26 @@ import Gallery from "./page/Gallery";
 import NewsEvents from "./page/Events";
 import Contact from "./page/ContactUs";
 import AboutUs from "./page/AboutUs";
-import AlumniDirectory from "./page/AlumniDirectory";
+// import AlumniDirectory from "./page/AlumniDirectory";
 import Opportunities from "./page/mentorships";
 
 // --- ADMIN COMPONENTS ---
 import AdminLogin from "./Admin/AdminLogin";
 import AdminDashboard from "./Admin/AdminDashboard";
 import ManageGallery from "./Admin/ManageGallery";
-import UsersDetails from "./Admin/UserDetails";
-import AdminFAQs from "./Admin/AdminFAQs";
-import AdminTestimonials from "./Admin/AdminTestimonials";
+// import UsersDetails from "./Admin/UserDetails";
+// import AdminFAQs from "./Admin/AdminFAQs";
+// import AdminTestimonials from "./Admin/AdminTestimonials";
 
 /* ─────────────────────────────────────────────────────────
  * PROTECTED ROUTES
  * ───────────────────────────────────────────────────────── */
 
 function ProtectedRoute({ children }) {
-  const user = localStorage.getItem("user");
+  // Updated to check for "token" to match your Auth.jsx login logic
+  const token = localStorage.getItem("token");
 
-  if (!user) {
+  if (!token) {
     return <Navigate to="/auth" replace />;
   }
 
@@ -64,7 +66,7 @@ function PublicLayout() {
 }
 
 /* ─────────────────────────────────────────────────────────
- * APP
+ * APP ROUTER
  * ───────────────────────────────────────────────────────── */
 
 function App() {
@@ -73,18 +75,22 @@ function App() {
       <ScrollToTop />
 
       <Routes>
-        {/* PUBLIC ROUTES */}
+        {/* =========================================
+            PUBLIC ROUTES
+            ========================================= */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/donations" element={<Donations />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutUs />} />
+          
+          {/* Note: You can wrap these in <ProtectedRoute> if you only want logged-in users to see them */}
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/events" element={<NewsEvents />} />
-          <Route path="/alumni-directory" element={<AlumniDirectory />} />
+          {/* <Route path="/alumni-directory" element={<AlumniDirectory />} /> */}
 
-          {/* Example protected user route */}
+          {/* Protected user route */}
           <Route
             path="/opportunities"
             element={
@@ -95,12 +101,15 @@ function App() {
           />
         </Route>
 
+        {/* =========================================
+            ADMIN ROUTES
+            ========================================= */}
         {/* ADMIN LOGIN */}
         <Route path="/admin" element={<AdminLogin />} />
 
         {/* ADMIN DASHBOARD */}
         <Route
-          path="/admin/*"
+          path="/admin/dashboard/*"
           element={
             <AdminProtectedRoute>
               <AdminDashboard />
@@ -108,10 +117,10 @@ function App() {
           }
         >
           <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<UsersDetails />} />
+          {/* <Route path="dashboard" element={<UsersDetails />} /> */}
           <Route path="gallery" element={<ManageGallery />} />
-          <Route path="faqs" element={<AdminFAQs />} />
-          <Route path="testimonials" element={<AdminTestimonials />} />
+          {/* <Route path="faqs" element={<AdminFAQs />} />
+          <Route path="testimonials" element={<AdminTestimonials />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>
