@@ -80,8 +80,6 @@
 // });
 // // Trigger reload: 1
 
-
-
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -93,7 +91,8 @@ const Admin = require('./models/Admin');
 
 // Route Files
 // const authRoutes = require('./routes/auth'); 
-const adminRoutes = require('./routes/adminRoutes');
+const adminRoutes = require('./routes/AdminRoutes');
+const visitorRoutes = require('./routes/VisitorRoutes'); // 👈 ADDED: Import visitor routes
 
 const app = express();
 
@@ -104,6 +103,7 @@ app.use(express.json());
 // Mount Routes
 // app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/visitors', visitorRoutes); // 👈 ADDED: Mount visitor routes
 
 // Database Connection & Initial Setup
 mongoose.connect(process.env.MONGO_URI)
