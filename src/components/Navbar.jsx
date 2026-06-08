@@ -26,18 +26,17 @@ export default function Navbar() {
     { name: "News & Events", path: "/events" },
     { name: "Contact Us", path: "/contact" },
     { name: "Gallery", path: "/Gallery" },
-    { name: "Alumni Direcory", path: "/Alumni Directory" },
+    { name: "Alumni Direcory", path: "/alumni" },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled
+      className={`fixed w-full z-50 transition-all duration-300 ${scrolled
           ? "bg-black/95 backdrop-blur-md border-b border-yellow-500/20 py-3 shadow-lg shadow-yellow-500/5"
           : "bg-black py-5 border-b border-zinc-900"
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         {/* LOGO */}
@@ -57,24 +56,22 @@ export default function Navbar() {
               <li key={link.name}>
                 <Link
                   to={link.path}
-                  className={`relative pb-1 transition-colors duration-300 ${
-                    isActive(link.path)
+                  className={`relative pb-1 transition-colors duration-300 ${isActive(link.path)
                       ? "text-yellow-500"
                       : "text-gray-300 hover:text-yellow-400"
-                  }`}
+                    }`}
                 >
                   {link.name}
                   {/* Underline Animation */}
                   <span
-                    className={`absolute left-0 bottom-0 h-[2px] bg-yellow-500 transition-all duration-300 ${
-                      isActive(link.path) ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                    style={{ 
+                    className={`absolute left-0 bottom-0 h-[2px] bg-yellow-500 transition-all duration-300 ${isActive(link.path) ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    style={{
                       width: isActive(link.path) ? "100%" : "0%",
                       transition: "width 0.3s ease"
                     }}
-                    // Adding a generic hover fix since group-hover needs a parent 'group' class. 
-                    // To keep it simple, we'll rely on the CSS below.
+                  // Adding a generic hover fix since group-hover needs a parent 'group' class. 
+                  // To keep it simple, we'll rely on the CSS below.
                   ></span>
                   <style>{`
                     a:hover span { width: 100% !important; }
@@ -119,18 +116,16 @@ export default function Navbar() {
 
       {/* MOBILE MENU DROPDOWN */}
       <div
-        className={`md:hidden absolute top-full left-0 w-full bg-zinc-950 border-b border-yellow-500/20 shadow-2xl transition-all duration-300 overflow-hidden ${
-          isOpen ? "max-h-96 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
-        }`}
+        className={`md:hidden absolute top-full left-0 w-full bg-zinc-950 border-b border-yellow-500/20 shadow-2xl transition-all duration-300 overflow-hidden ${isOpen ? "max-h-96 py-4 opacity-100" : "max-h-0 py-0 opacity-0"
+          }`}
       >
         <ul className="flex flex-col px-6 gap-4 text-center">
           {navLinks.map((link) => (
             <li key={link.name}>
               <Link
                 to={link.path}
-                className={`block text-lg font-bold py-2 ${
-                  isActive(link.path) ? "text-yellow-500" : "text-gray-300"
-                }`}
+                className={`block text-lg font-bold py-2 ${isActive(link.path) ? "text-yellow-500" : "text-gray-300"
+                  }`}
               >
                 {link.name}
               </Link>

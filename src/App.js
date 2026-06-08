@@ -13,14 +13,16 @@ import Gallery from "./page/Gallery";
 import NewsEvents from "./page/Events";
 import Contact from "./page/ContactUs";
 import AboutUs from "./page/AboutUs";
-// import AlumniDirectory from "./page/AlumniDirectory";
+import AlumniDirectory from "./page/AlumniDirectory";
 import Opportunities from "./page/mentorships";
 
 // --- ADMIN COMPONENTS ---
 import AdminLogin from "./Admin/AdminLogin";
 import AdminDashboard from "./Admin/AdminDashboard";
 import ManageGallery from "./Admin/ManageGallery";
+import ManageEvents from "./Admin/ManageEvents";
 import UsersDetails from "./Admin/UsersDetails";
+import ManageAlumni from "./Admin/ManageAlumni";
 // import AdminFAQs from "./Admin/AdminFAQs";
 // import AdminTestimonials from "./Admin/AdminTestimonials";
 
@@ -113,7 +115,7 @@ function App() {
           
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/events" element={<NewsEvents />} />
-          {/* <Route path="/alumni-directory" element={<AlumniDirectory />} /> */}
+          <Route path="/alumni" element={<AlumniDirectory />} />
 
           {/* Protected user route */}
           <Route
@@ -151,6 +153,8 @@ function App() {
           <Route path="users" element={<UsersDetails />} />
           <Route path="visitors" element={<UsersDetails />} />
           <Route path="gallery" element={<ManageGallery />} />
+           <Route path="events" element={<ManageEvents />} />
+           <Route path="alumni" element={<ManageAlumni />} />
           {/* <Route path="faqs" element={<AdminFAQs />} /> */}
           {/* <Route path="testimonials" element={<AdminTestimonials />} /> */}
         </Route>

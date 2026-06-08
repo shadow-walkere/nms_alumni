@@ -38,7 +38,7 @@ export default function Footer() {
 
   return (
     <footer className="relative overflow-hidden bg-black text-gray-300 py-16 mt-20 font-sans border-t border-zinc-900 selection:bg-yellow-500 selection:text-black">
-      
+
       {/* ✨ Subtle Animated Golden Glow */}
       <motion.div
         className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(234,179,8,0.05),transparent_50%)] pointer-events-none"
@@ -48,7 +48,7 @@ export default function Footer() {
 
       {/* Content Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-        
+
         {/* 🏡 Brand & Intro */}
         <motion.div
           variants={fadeUp(0.1)}

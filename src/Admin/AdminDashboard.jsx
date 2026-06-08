@@ -25,7 +25,7 @@ const AdminDashboard = () => {
   const navItems = [
     { to: "users", label: "Visitor Details", icon: <Users className="w-5 h-5" /> },
 
-    { to: "users", label: "Alumni Directory", icon: <Users className="w-5 h-5" /> },
+    { to: "alumni", label: "Alumni Directory", icon: <Users className="w-5 h-5" /> },
     { to: "gallery", label: "Manage Gallery", icon: <ImageIcon className="w-5 h-5" /> },
     { to: "events", label: "Events & News", icon: <CalendarDays className="w-5 h-5" /> },
     { to: "mentorships", label: "Mentorships", icon: <Briefcase className="w-5 h-5" /> },

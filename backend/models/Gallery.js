@@ -1,21 +1,18 @@
 const mongoose = require("mongoose");
 
-const galleryImageSchema = new mongoose.Schema(
+const gallerySchema = new mongoose.Schema(
   {
-    category: {
+    title: {
       type: String,
-      enum: [
-        "All",
-        "Weddings",
-        "Food & Drinks",
-        "Accommodation",
-        "Team Building",
-        "Picnics",
-        "Adventure playground",
-      ],
-      default: "All",
+      trim: true,
+      default: "Untitled Media",
     },
-    imageUrl: {
+    type: {
+      type: String,
+      enum: ["image", "video"],
+      default: "image",
+    },
+    url: {
       type: String,
       required: true,
     },
@@ -23,8 +20,26 @@ const galleryImageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      enum: [
+        "all",            // Default / uncategorised
+        "reunions",       // Class reunions, homecoming
+        "networking",     // Professional meetups, mentoring
+        "achievements",   // Awards, milestones, success stories
+      ],
+      default: "all",
+      lowercase: true,
+    },
+    uploadedBy: {
+      type: String,
+      default: "admin",
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Gallery", galleryImageSchema);
+// Full-text search for title, plus index on category
+gallerySchema.index({ title: "text", category: 1 });
+
+module.exports = mongoose.model("Gallery", gallerySchema);

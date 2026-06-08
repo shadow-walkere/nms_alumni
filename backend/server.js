@@ -92,7 +92,10 @@ const Admin = require('./models/Admin');
 // Route Files
 // const authRoutes = require('./routes/auth'); 
 const adminRoutes = require('./routes/AdminRoutes');
-const visitorRoutes = require('./routes/VisitorRoutes'); // 👈 ADDED: Import visitor routes
+const visitorRoutes = require('./routes/VisitorRoutes'); 
+const galleryRoutes = require('./routes/GalleryRoute');
+const newsEventsRoutes = require('./routes/NewsEvents');
+const alumniRoutes = require('./routes/AlumniRoute');
 
 const app = express();
 
@@ -103,7 +106,10 @@ app.use(express.json());
 // Mount Routes
 // app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/visitors', visitorRoutes); // 👈 ADDED: Mount visitor routes
+app.use('/api/visitors', visitorRoutes);
+app.use('/api/gallery', galleryRoutes);
+app.use('/api/news-events', newsEventsRoutes);
+app.use('/api/alumni', alumniRoutes);
 
 // Database Connection & Initial Setup
 mongoose.connect(process.env.MONGO_URI)
@@ -149,3 +155,4 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+// Trigger nodemon restart: 3

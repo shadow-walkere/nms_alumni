@@ -108,8 +108,10 @@ router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // 1. Check if admin exists
-    const admin = await Admin.findOne({ username });
+    // 1. Check if admin exists (case-insensitive)
+    const admin = await Admin.findOne({
+      username: { $regex: new RegExp(`^${username}$`, 'i') }
+    });
     if (!admin) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }

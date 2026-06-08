@@ -269,11 +269,10 @@ export default function Home() {
             <button
               key={idx}
               onClick={() => setHeroSlideIndex(idx)}
-              className={`h-2.5 rounded-full transition-all duration-500 ${
-                idx === heroSlideIndex
+              className={`h-2.5 rounded-full transition-all duration-500 ${idx === heroSlideIndex
                   ? "w-10 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.5)]"
                   : "w-2.5 bg-white/30 hover:bg-white/60"
-              }`}
+                }`}
             />
           ))}
         </div>
@@ -526,11 +525,10 @@ export default function Home() {
             {featuredContent.map((item, index) => (
               <div
                 key={item.id}
-                className={`absolute inset-0 transition-all duration-1000 ease-out ${
-                  index === currentSlide
+                className={`absolute inset-0 transition-all duration-1000 ease-out ${index === currentSlide
                     ? "opacity-100 scale-100 z-10"
                     : "opacity-0 scale-105 z-0"
-                }`}
+                  }`}
               >
                 <img
                   src={item.image}
@@ -615,11 +613,10 @@ export default function Home() {
                 <button
                   key={idx}
                   onClick={() => setCurrentSlide(idx)}
-                  className={`h-2.5 rounded-full transition-all duration-500 ${
-                    idx === currentSlide
+                  className={`h-2.5 rounded-full transition-all duration-500 ${idx === currentSlide
                       ? "w-10 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.5)]"
                       : "w-2.5 bg-white/30 hover:bg-white/60"
-                  }`}
+                    }`}
                 />
               ))}
             </div>
@@ -655,29 +652,26 @@ export default function Home() {
               <div
                 key={index}
                 data-reveal
-                className={`rounded-2xl border transition-all duration-500 ${
-                  openFaq === index
+                className={`rounded-2xl border transition-all duration-500 ${openFaq === index
                     ? "border-yellow-500/30 bg-yellow-500/5 shadow-[0_0_30px_rgba(234,179,8,0.08)]"
                     : "border-white/5 bg-white/[0.02] hover:border-white/10"
-                }`}
+                  }`}
               >
                 <button
                   onClick={() => toggleFaq(index)}
                   className="flex w-full items-center justify-between p-6 text-left focus:outline-none"
                 >
                   <h3
-                    className={`font-bold text-lg transition-colors duration-300 ${
-                      openFaq === index ? "text-yellow-500" : "text-white"
-                    }`}
+                    className={`font-bold text-lg transition-colors duration-300 ${openFaq === index ? "text-yellow-500" : "text-white"
+                      }`}
                   >
                     {faq.question}
                   </h3>
                   <span
-                    className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
-                      openFaq === index
+                    className={`ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${openFaq === index
                         ? "bg-yellow-500 text-black border-yellow-500 rotate-180"
                         : "bg-transparent text-gray-400 border-white/10"
-                    }`}
+                      }`}
                   >
                     <svg
                       className="h-4 w-4"
@@ -695,9 +689,8 @@ export default function Home() {
                   </span>
                 </button>
                 <div
-                  className={`transition-all duration-500 ease-in-out overflow-hidden ${
-                    openFaq === index ? "max-h-40 pb-6 px-6" : "max-h-0"
-                  }`}
+                  className={`transition-all duration-500 ease-in-out overflow-hidden ${openFaq === index ? "max-h-40 pb-6 px-6" : "max-h-0"
+                    }`}
                 >
                   <p className="text-gray-400 text-sm leading-relaxed border-t border-white/5 pt-4">
                     {faq.answer}

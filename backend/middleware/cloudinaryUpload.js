@@ -6,6 +6,7 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: {
     folder: "Green_World",
+     resource_type: "auto",
     allowed_formats: ["jpg", "png", "jpeg", "webp"],
   },
 });
