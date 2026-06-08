@@ -99,8 +99,31 @@ const alumniRoutes = require('./routes/AlumniRoute');
 
 const app = express();
 
+// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:3000", // For development
+  "http://localhost:3001", // For development
+  "https://nms-alumni.onrender.com/",
+];
+
+
 // Middleware
 app.use(cors());
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      console.log("Origin:", origin); // Log the origin to check the requests
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "*"],
+    credentials: true, // Allow cookies or credentials if necessary
+  })
+);
 app.use(express.json());
 
 // Mount Routes
