@@ -103,7 +103,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000", // For development
   "http://localhost:3001", // For development
-  "https://nms-alumni.onrender.com/",
+  "https://nms-alumni.onrender.com",
 ];
 
 
