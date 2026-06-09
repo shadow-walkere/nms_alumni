@@ -27,6 +27,7 @@ const gallerySchema = new mongoose.Schema(
         "reunions",       // Class reunions, homecoming
         "networking",     // Professional meetups, mentoring
         "achievements",   // Awards, milestones, success stories
+        "leadership",
       ],
       default: "all",
       lowercase: true,

@@ -11,85 +11,96 @@ import {
   Filter,
   Layers,
   Video,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const SERVER_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) || 
+const SERVER_URL =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SERVER_URL) ||
+  (typeof process !== "undefined" && process.env?.REACT_APP_SERVER_URL) ||
   "http://localhost:5000";
 
 const AlumniGallery = () => {
-  // State
   const [activeTab, setActiveTab] = useState("all");
-  const [lightbox, setLightbox] = useState({
-    isOpen: false,
-    src: "",
-    type: "image",
-    title: "",
-  });
   const [mediaItems, setMediaItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // ============================================
-  // TAB DEFINITIONS – ALUMNI FOCUSED
-  // ============================================
+  // Lightbox state – now includes current index for slider navigation
+  const [lightbox, setLightbox] = useState({
+    isOpen: false,
+    currentIndex: 0,
+  });
+
   const tabs = [
     { id: "all", label: "All Moments", icon: <Layers size={16} /> },
     { id: "reunions", label: "Reunions", icon: <Users size={16} /> },
+    { id: "leadership", label: "Leadership", icon: <Users size={16} /> },
     { id: "networking", label: "Networking", icon: <Briefcase size={16} /> },
     { id: "achievements", label: "Achievements", icon: <Trophy size={16} /> },
     { id: "videos", label: "Videos", icon: <Video size={16} /> },
   ];
 
-  // ============================================
-  // LIGHTBOX HANDLERS
-  // ============================================
-  const openLightbox = (src, type = "image", title = "") => {
-    setLightbox({ isOpen: true, src, type, title });
+  // Open lightbox at a specific index
+  const openLightbox = (index) => {
+    setLightbox({ isOpen: true, currentIndex: index });
     document.body.style.overflow = "hidden";
   };
 
   const closeLightbox = () => {
-    setLightbox({ isOpen: false, src: "", type: "image", title: "" });
+    setLightbox({ isOpen: false, currentIndex: 0 });
     document.body.style.overflow = "auto";
   };
 
+  // Navigate lightbox
+  const goToPrev = (e) => {
+    if (e) e.stopPropagation();
+    setLightbox((prev) => ({
+      ...prev,
+      currentIndex: (prev.currentIndex - 1 + mediaItems.length) % mediaItems.length,
+    }));
+  };
+
+  const goToNext = (e) => {
+    if (e) e.stopPropagation();
+    setLightbox((prev) => ({
+      ...prev,
+      currentIndex: (prev.currentIndex + 1) % mediaItems.length,
+    }));
+  };
+
+  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (!lightbox.isOpen) return;
       if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") goToPrev();
+      if (e.key === "ArrowRight") goToNext();
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [lightbox.isOpen, mediaItems.length]);
 
-  // ============================================
-  // FETCH MEDIA – ALL FILTERING DONE SERVER‑SIDE
-  // ============================================
+  // Fetch media from server
   useEffect(() => {
     const fetchMedia = async () => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
-
-        // Map active tab to backend categories
         if (activeTab === "videos") {
           params.append("type", "video");
         } else if (activeTab !== "all") {
           params.append("type", "image");
           params.append("category", activeTab);
         }
-
         if (searchQuery.trim()) {
           params.append("search", searchQuery.trim());
         }
-
         const url = `${SERVER_URL}/api/gallery${
           params.toString() ? `?${params.toString()}` : ""
         }`;
-
         const response = await axios.get(url);
         const data = response.data.data || response.data || [];
         setMediaItems(Array.isArray(data) ? data : []);
@@ -101,22 +112,19 @@ const AlumniGallery = () => {
         setLoading(false);
       }
     };
-
     fetchMedia();
   }, [activeTab, searchQuery]);
 
-  // ============================================
-  // RENDER
-  // ============================================
+  const currentItem = mediaItems[lightbox.currentIndex] || {};
+
   return (
     <div className="bg-slate-50 overflow-x-hidden min-h-screen font-sans selection:bg-blue-200">
-      {/* 🌟 ALUMNI HERO */}
+      {/* HERO */}
       <section className="relative h-[45vh] min-h-[350px] flex items-center justify-center overflow-hidden bg-slate-900">
         <div className="absolute inset-0 opacity-40">
           <div className="w-full h-full bg-gradient-to-r from-blue-700 to-indigo-800"></div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/30"></div>
-
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-200 text-xs font-bold uppercase tracking-widest mb-4">
             <ImageIcon size={14} /> Alumni Gallery
@@ -134,7 +142,7 @@ const AlumniGallery = () => {
         </div>
       </section>
 
-      {/* 🔍 FILTER BAR */}
+      {/* FILTER BAR */}
       <div className="sticky top-0 z-40 bg-slate-50/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -148,7 +156,6 @@ const AlumniGallery = () => {
                 className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm font-medium text-slate-700 shadow-sm transition-all"
               />
             </div>
-
             <div className="w-full md:w-auto overflow-x-auto no-scrollbar md:order-1">
               <div className="flex items-center gap-2 pb-1 md:pb-0">
                 {tabs.map((tab) => (
@@ -170,7 +177,7 @@ const AlumniGallery = () => {
         </div>
       </div>
 
-      {/* 🖼️ GALLERY GRID */}
+      {/* GALLERY GRID – exactly 3 columns on desktop */}
       <section className="px-4 md:px-8 py-12 min-h-[50vh]">
         <div className="max-w-7xl mx-auto">
           {loading ? (
@@ -193,12 +200,12 @@ const AlumniGallery = () => {
               </p>
             </div>
           ) : (
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
-              {mediaItems.map((item) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {mediaItems.map((item, idx) => (
                 <div
                   key={item._id}
-                  className="group relative break-inside-avoid bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-slate-100 hover:border-blue-100"
-                  onClick={() => openLightbox(item.url, item.type, item.title)}
+                  className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-slate-100 hover:border-blue-100"
+                  onClick={() => openLightbox(idx)}
                 >
                   <div className="relative overflow-hidden">
                     {item.type === "video" ? (
@@ -222,7 +229,7 @@ const AlumniGallery = () => {
                       <img
                         src={item.url}
                         alt={item.title}
-                        className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
                         loading="lazy"
                       />
                     )}
@@ -247,69 +254,79 @@ const AlumniGallery = () => {
         </div>
       </section>
 
-      {/* 🎥 LIGHTBOX */}
+      {/* LIGHTBOX WITH SLIDER */}
       {lightbox.isOpen && (
         <div
           className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300"
           onClick={closeLightbox}
         >
+          {/* Close button */}
           <button
-            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50 focus:outline-none focus:ring-2 focus:ring-white"
+            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
             onClick={closeLightbox}
             aria-label="Close lightbox"
           >
             <X size={28} />
           </button>
 
+          {/* Prev / Next arrows */}
+          {mediaItems.length > 1 && (
+            <>
+              <button
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+                onClick={goToPrev}
+                aria-label="Previous"
+              >
+                <ChevronLeft size={32} />
+              </button>
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+                onClick={goToNext}
+                aria-label="Next"
+              >
+                <ChevronRight size={32} />
+              </button>
+            </>
+          )}
+
+          {/* Media container */}
           <div
             className="relative w-full max-w-5xl flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            {lightbox.type === "image" ? (
-              <img
-                src={lightbox.src}
-                alt={lightbox.title}
-                className="max-h-[85vh] w-auto rounded-lg shadow-2xl object-contain"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src =
-                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23f1f5f9' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='16'%3EImage not available%3C/text%3E%3C/svg%3E";
-                }}
-              />
-            ) : (
+            {currentItem.type === "video" ? (
               <div className="w-full aspect-video max-h-[85vh]">
                 <video
-                  src={lightbox.src}
+                  src={currentItem.url}
                   controls
                   autoPlay
                   muted
                   className="w-full h-full rounded-lg shadow-2xl"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    const parent = e.target.parentElement;
-                    const fallback = document.createElement("div");
-                    fallback.className =
-                      "flex items-center justify-center bg-slate-800 rounded-lg h-full";
-                    fallback.innerHTML =
-                      "<p class='text-white'>Video unavailable</p>";
-                    parent.appendChild(fallback);
-                  }}
                 />
               </div>
+            ) : (
+              <img
+                src={currentItem.url}
+                alt={currentItem.title}
+                className="max-h-[85vh] w-auto rounded-lg shadow-2xl object-contain"
+              />
             )}
 
-            {lightbox.title && (
+            {currentItem.title && (
               <div className="mt-4 text-center">
                 <h3 className="text-lg font-bold text-white tracking-wide">
-                  {lightbox.title}
+                  {currentItem.title}
                 </h3>
+                <p className="text-slate-400 text-sm mt-1">
+                  {lightbox.currentIndex + 1} / {mediaItems.length}
+                </p>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* 🚀 ALUMNI CTA */}
+      {/* FOOTER CTA */}
       <section className="py-20 bg-white border-t border-slate-100 text-center">
         <div className="max-w-3xl mx-auto px-6">
           <h2 className="text-3xl font-black text-slate-900 mb-4">
@@ -321,7 +338,7 @@ const AlumniGallery = () => {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href="https://facebook.com/groups/alumni" // Replace with actual URL
+              href="https://facebook.com/groups/alumni"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 bg-[#1877F2] text-white font-bold rounded-full hover:shadow-lg hover:-translate-y-1 transition-all"
@@ -329,7 +346,7 @@ const AlumniGallery = () => {
               Facebook Group
             </a>
             <a
-              href="https://linkedin.com/groups/alumni" // Replace
+              href="https://linkedin.com/groups/alumni"
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-3 bg-[#0A66C2] text-white font-bold rounded-full hover:shadow-lg hover:-translate-y-1 transition-all"
@@ -337,7 +354,7 @@ const AlumniGallery = () => {
               LinkedIn Network
             </a>
             <a
-              href="/alumni/register" // Internal route
+              href="/alumni/register"
               className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-lg hover:-translate-y-1 transition-all"
             >
               Alumni Portal
