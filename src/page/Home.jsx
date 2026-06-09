@@ -1,103 +1,36 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const SERVER_URL =
+  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SERVER_URL) ||
+  (typeof process !== "undefined" && process.env?.REACT_APP_SERVER_URL) ||
+  "http://localhost:5000";
 
 /* ============================================================
-   DATA – Hero Slider & Existing Content
+   DATA – Hero Slider (unchanged)
    ============================================================ */
 const heroSlides = [
   {
-    image:
-      "../Assets/homepage1.jpg",
-    caption: "We had an lively session with our alumni at the NMS field",
+    image: "../Assets/homepage1.jpg",
+    caption: "We had a lively session with our alumni at the NMS field",
   },
-
   {
-    image:
-      "../Assets/homepage.jpg",
+    image: "../Assets/homepage.jpg",
     caption: "Alumni Networking & Mentorship Session",
   },
   {
-    image:
-      "../Assets/pioneerclass.jpg",
+    image: "../Assets/pioneerclass.jpg",
     caption: "Some of Our proud Pioneer class members",
   },
   {
-    image:
-      "../Assets/reunion.jpg",
+    image: "../Assets/reunion.jpg",
     caption: "Our first Alumni Reunion event in December",
   },
   {
-    image:
-      "../Assets/games2.jpg",
+    image: "../Assets/games2.jpg",
     caption: "We participated in some fun games",
-  },
-];
-
-const featuredContent = [
-  {
-    id: 1,
-    type: "Event",
-    title: "Annual Alumni Gala Dinner 2026",
-    date: "December 12, 2026",
-    location: "Sarit Expo Centre, Nairobi",
-    excerpt:
-      "Join us for an evening of networking, celebration, and raising funds for the NMS Endowment. Dress code is strictly black tie.",
-    content:
-      "The Annual Alumni Gala Dinner is a night of celebration, networking, and fundraising for the NMS Endowment Fund. The evening will feature a keynote address by prominent industry leaders, awards for outstanding alumni, and live entertainment. Don't miss this chance to reconnect with your peers.",
-    image:
-      "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    type: "Opportunity",
-    title: "Postgraduate Scholarship Fund",
-    date: "Applications open until Aug 2026",
-    location: "Online Portal",
-    excerpt:
-      "Applications are now open for the NMS Alumni Scholarship designed for recent graduates pursuing Masters degrees.",
-    content:
-      "Applications are now open for the NMS Alumni Scholarship designed for recent graduates pursuing Masters degrees in STEM and Education. Ensure your profile is updated before applying through the portal. Funding covers up to 75% of tuition for selected candidates.",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    type: "News",
-    title: "New Science Wing Inaugurated",
-    date: "May 10, 2026",
-    location: "NMS Main Campus",
-    excerpt:
-      "Thanks to the generous contributions from our 2010-2015 alumni cohort, the new state-of-the-art labs are open.",
-    content:
-      "Thanks to the generous contributions from our 2010-2015 alumni cohort, the new state-of-the-art chemistry and physics labs are officially open. This will significantly boost the research capabilities of our current students and prepare them for global STEM challenges.",
-    image:
-      "https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    type: "Event",
-    title: "Tech Career Fair & Networking",
-    date: "June 20, 2026",
-    location: "NMS Main Hall",
-    excerpt:
-      "Connect with top tech companies and NMS alumni. Bring your updated resume for on-the-spot interviews.",
-    content:
-      "Are you an undergraduate looking for attachments or a recent graduate looking for a job? The Alumni Tech Career Fair brings together top tech companies and NMS alumni. Prepare your portfolio and join us for a day of networking and career building.",
-    image:
-      "https://images.unsplash.com/photo-1556761175-5973dc0f32b7?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    id: 5,
-    type: "News",
-    title: "Mentorship Drive a Huge Success",
-    date: "March 25, 2026",
-    location: "Virtual & On-Campus",
-    excerpt:
-      "Over 50 alumni returned to campus to mentor current high school seniors.",
-    content:
-      "The annual mentorship drive saw record attendance. Over 50 alumni spanning various professions spent the weekend conducting workshops and one-on-one career counseling for the graduating class. We thank everyone who volunteered their time and expertise.",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop",
   },
 ];
 
@@ -152,20 +85,45 @@ const useScrollReveal = (threshold = 0.1) => {
   }, [threshold]);
 };
 
-/* ============================================================
-   MAIN COMPONENT
-   ============================================================ */
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // ── State ──
   const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedItem, setSelectedItem] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [openFaq, setOpenFaq] = useState(null);
+  const [liveItems, setLiveItems] = useState([]);
+  const [loadingItems, setLoadingItems] = useState(true);
+
   const heroTimer = useRef(null);
   const newsTimer = useRef(null);
 
-  // Activate scroll reveal
   useScrollReveal();
+
+  // ── Fetch live news & events ──
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        setLoadingItems(true);
+        const res = await axios.get(`${SERVER_URL}/api/news-events`);
+        const data = res.data.data || [];
+        // Sort by date descending (newest first)
+        const sorted = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setLiveItems(sorted);
+      } catch (err) {
+        console.error("Failed to fetch news/events for homepage:", err);
+        toast.error("Could not load latest news");
+      } finally {
+        setLoadingItems(false);
+      }
+    };
+    fetchItems();
+  }, []);
+
+  // Reset slider index when liveItems changes
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [liveItems]);
 
   // Hero slider auto‑rotate
   useEffect(() => {
@@ -175,18 +133,25 @@ export default function Home() {
     return () => clearInterval(heroTimer.current);
   }, []);
 
-  // News slider auto‑rotate
-  const nextSlide = () =>
-    setCurrentSlide((prev) => (prev + 1) % featuredContent.length);
-  const prevSlide = () =>
-    setCurrentSlide((prev) =>
-      prev === 0 ? featuredContent.length - 1 : prev - 1
-    );
+  const nextSlide = () => {
+    if (liveItems.length > 0) {
+      setCurrentSlide((prev) => (prev + 1) % liveItems.length);
+    }
+  };
+  const prevSlide = () => {
+    if (liveItems.length > 0) {
+      setCurrentSlide((prev) =>
+        prev === 0 ? liveItems.length - 1 : prev - 1
+      );
+    }
+  };
 
   useEffect(() => {
-    newsTimer.current = setInterval(nextSlide, 6000);
+    if (liveItems.length > 0) {
+      newsTimer.current = setInterval(nextSlide, 6000);
+    }
     return () => clearInterval(newsTimer.current);
-  }, []);
+  }, [liveItems]);
 
   // Notification helper
   const triggerNotification = (message) => {
@@ -207,17 +172,27 @@ export default function Home() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+  // Helper to format dates
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="relative min-h-screen bg-black font-sans text-gray-300 selection:bg-yellow-500 selection:text-black overflow-hidden">
       {/* ==================== TOAST NOTIFICATIONS ==================== */}
-      <div className="fixed top-24 right-6 z-[999] flex flex-col gap-3 pointer-events-none">
+      <div className="fixed top-20 sm:top-24 right-4 sm:right-6 z-[999] flex flex-col gap-3 pointer-events-none max-w-xs sm:max-w-sm">
         {notifications.map((notif) => (
           <div
             key={notif.id}
-            className="pointer-events-auto flex items-center gap-3 rounded-xl bg-white/10 backdrop-blur-xl border border-yellow-500/30 px-5 py-3 text-white shadow-[0_8px_32px_rgba(234,179,8,0.15)] animate-slide-in-right"
+            className="pointer-events-auto flex items-center gap-3 rounded-xl bg-white/10 backdrop-blur-xl border border-yellow-500/30 px-4 sm:px-5 py-3 text-white text-sm shadow-[0_8px_32px_rgba(234,179,8,0.15)] animate-slide-in-right"
           >
             <svg
-              className="h-5 w-5 text-yellow-500"
+              className="h-5 w-5 text-yellow-500 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -229,14 +204,13 @@ export default function Home() {
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-            <span className="font-semibold text-sm">{notif.message}</span>
+            <span className="font-semibold text-xs sm:text-sm line-clamp-2">{notif.message}</span>
           </div>
         ))}
       </div>
 
-      {/* ==================== HERO SLIDER ==================== */}
-      <section className="relative flex h-[650px] items-center justify-center overflow-hidden text-center text-white">
-        {/* Dynamic background images */}
+      {/* ==================== HERO SLIDER (unchanged) ==================== */}
+      <section className="relative flex h-screen sm:h-[650px] items-center justify-center overflow-hidden text-center text-white pt-20 sm:pt-0">
         {heroSlides.map((slide, index) => (
           <div
             key={index}
@@ -250,72 +224,63 @@ export default function Home() {
           />
         ))}
 
-        {/* Gradient overlay for readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/70 to-black/95 z-10" />
-
-        {/* Floating ambient light */}
         <div className="absolute top-1/4 left-1/4 h-64 w-64 bg-yellow-500/10 rounded-full blur-3xl animate-pulse z-20" />
 
-        {/* Caption for the current hero slide */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
-          <div className="inline-block rounded-full border border-yellow-500/20 bg-white/10 backdrop-blur-md px-5 py-2 text-sm font-medium text-white shadow-lg">
-            {heroSlides[heroSlideIndex].caption}
-          </div>
-        </div>
-
-        {/* Dot indicators */}
-        <div className="absolute bottom-8 right-8 z-30 flex gap-2">
-          {heroSlides.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setHeroSlideIndex(idx)}
-              className={`h-2.5 rounded-full transition-all duration-500 ${idx === heroSlideIndex
-                  ? "w-10 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.5)]"
-                  : "w-2.5 bg-white/30 hover:bg-white/60"
-                }`}
-            />
-          ))}
-        </div>
-
-        {/* Main hero content – always visible */}
-        <div className="relative z-30 max-w-4xl px-4 animate-fade-in-up">
-          <span className="inline-block rounded-full border border-yellow-500/30 bg-yellow-500/10 backdrop-blur-md px-5 py-2 text-xs font-bold uppercase tracking-widest text-yellow-500">
+        <div className="relative z-30 max-w-4xl px-4 sm:px-6 animate-fade-in-up pb-32 sm:pb-0">
+          <span className="inline-block rounded-full border border-yellow-500/30 bg-yellow-500/10 backdrop-blur-md px-4 sm:px-5 py-2 text-xs font-bold uppercase tracking-widest text-yellow-500">
             Welcome Home, Alumni
           </span>
-
-          <h1 className="mt-6 text-5xl md:text-7xl font-extrabold leading-tight">
+          <h1 className="mt-4 sm:mt-6 text-3xl sm:text-5xl md:text-7xl font-extrabold leading-tight">
             Connecting Generations{" "}
             <br />
             <span className="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
               of Excellence
             </span>
           </h1>
-
-          <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto backdrop-blur-sm">
+          <p className="mt-4 sm:mt-6 text-base sm:text-lg text-gray-300 max-w-2xl mx-auto backdrop-blur-sm px-2 sm:px-0">
             Empowering the Nambale Magnet community to reconnect, foster
             mentorship, and give back to the institution that shaped our
             foundations.
           </p>
-
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto">
             <Link
               to="/auth"
-              className="group relative overflow-hidden rounded-xl bg-yellow-500 px-8 py-4 font-bold text-black shadow-[0_0_25px_rgba(234,179,8,0.4)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(234,179,8,0.6)]"
+              className="group relative overflow-hidden rounded-lg sm:rounded-xl bg-yellow-500 px-6 sm:px-8 py-3 sm:py-4 font-bold text-black text-sm sm:text-base shadow-[0_0_25px_rgba(234,179,8,0.4)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_40px_rgba(234,179,8,0.6)] flex items-center justify-center whitespace-nowrap order-1 sm:order-none"
             >
               <span className="relative z-10">Join the Network</span>
               <div className="absolute inset-0 -z-0 bg-gradient-to-r from-yellow-400 to-amber-400 opacity-0 transition-opacity group-hover:opacity-100" />
             </Link>
             <Link
               to="/alumni"
-              className="group rounded-xl border border-white/10 bg-white/5 backdrop-blur-md px-8 py-4 font-semibold text-white transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500/60 hover:bg-yellow-500/10"
+              className="group rounded-lg sm:rounded-xl border border-white/10 bg-white/5 backdrop-blur-md px-6 sm:px-8 py-3 sm:py-4 font-semibold text-white text-sm sm:text-base transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500/60 hover:bg-yellow-500/10 flex items-center justify-center whitespace-nowrap order-2 sm:order-none"
             >
               Browse Directory
             </Link>
           </div>
         </div>
+
+        <div className="absolute bottom-24 sm:bottom-20 left-1/2 -translate-x-1/2 z-30 px-4 w-full sm:w-auto sm:max-w-md">
+          <div className="inline-block rounded-lg sm:rounded-full border border-yellow-500/20 bg-white/10 backdrop-blur-md px-3 sm:px-5 py-2 text-xs sm:text-sm font-medium text-white shadow-lg w-full sm:w-auto text-center">
+            {heroSlides[heroSlideIndex].caption}
+          </div>
+        </div>
+
+        <div className="absolute bottom-8 sm:bottom-8 right-4 sm:right-8 z-30 flex gap-2">
+          {heroSlides.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setHeroSlideIndex(idx)}
+              className={`h-2 sm:h-2.5 rounded-full transition-all duration-500 ${idx === heroSlideIndex
+                  ? "w-8 sm:w-10 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.5)]"
+                  : "w-2 sm:w-2.5 bg-white/30 hover:bg-white/60"
+                }`}
+            />
+          ))}
+        </div>
       </section>
 
-      {/* ==================== ABOUT THE SCHOOL ==================== */}
+      {/* ==================== ABOUT THE SCHOOL (unchanged) ==================== */}
       <section className="relative max-w-7xl mx-auto px-6 py-24 lg:py-32 grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
         <div className="relative group" data-reveal>
           <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-yellow-500 to-amber-600 opacity-20 blur-xl transition-opacity duration-700 group-hover:opacity-40" />
@@ -337,7 +302,6 @@ export default function Home() {
             </span>{" "}
             & Service
           </h2>
-
           <div className="mt-8 space-y-6 text-gray-400 text-lg">
             <p>
               The Association was founded in December 2025 on the principles of
@@ -366,7 +330,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ==================== GOALS SECTION ==================== */}
+      {/* ==================== GOALS SECTION (unchanged) ==================== */}
       <section className="relative border-t border-white/5 bg-gradient-to-b from-black to-zinc-950 py-24">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16" data-reveal>
@@ -379,23 +343,12 @@ export default function Home() {
               mater.
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 icon: (
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
-                    />
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
@@ -406,13 +359,7 @@ export default function Home() {
               },
               {
                 icon: (
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                  >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
                     <path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
                   </svg>
@@ -422,13 +369,7 @@ export default function Home() {
               },
               {
                 icon: (
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                  >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                   </svg>
@@ -438,13 +379,7 @@ export default function Home() {
               },
               {
                 icon: (
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                  >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z" />
                   </svg>
                 ),
@@ -453,13 +388,7 @@ export default function Home() {
               },
               {
                 icon: (
-                  <svg
-                    className="w-7 h-7"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth="2"
-                  >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
                   </svg>
@@ -488,21 +417,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ==================== DYNAMIC HIGHLIGHT SLIDER ==================== */}
+      {/* ==================== DYNAMIC HIGHLIGHT SLIDER (NOW LIVE) ==================== */}
       <section id="news" className="relative bg-black py-24 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 sm:gap-0 mb-12">
             <div data-reveal>
               <h2 className="text-4xl md:text-5xl font-bold text-white">
                 News and <span className="text-yellow-500">Events</span>
               </h2>
               <p className="text-gray-400 mt-2 text-lg">
-                Latest news, opportunities, and upcoming gatherings.
+                Latest stories and upcoming gatherings from our community.
               </p>
             </div>
             <Link
               to="/events"
-              className="hidden md:inline-flex items-center gap-2 text-yellow-500 font-bold hover:text-yellow-400 transition-colors group"
+              className="hidden md:inline-flex items-center gap-2 text-yellow-500 font-bold hover:text-yellow-400 transition-colors group whitespace-nowrap"
             >
               View All{" "}
               <svg
@@ -521,110 +450,98 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-950 shadow-2xl group h-[500px]">
-            {featuredContent.map((item, index) => (
-              <div
-                key={item.id}
-                className={`absolute inset-0 transition-all duration-1000 ease-out ${index === currentSlide
-                    ? "opacity-100 scale-100 z-10"
-                    : "opacity-0 scale-105 z-0"
+          {loadingItems ? (
+            <div className="flex justify-center items-center h-[350px] sm:h-[500px] bg-zinc-950 border border-white/5 rounded-3xl">
+              <div className="w-10 h-10 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : liveItems.length === 0 ? (
+            <div className="flex justify-center items-center h-[350px] sm:h-[500px] bg-zinc-950 border border-white/5 rounded-3xl">
+              <p className="text-gray-500 text-lg">No news or events yet. Check back soon!</p>
+            </div>
+          ) : (
+            <div className="relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-950 shadow-2xl group h-[350px] sm:h-[500px]">
+              {liveItems.map((item, index) => (
+                <div
+                  key={item._id}
+                  className={`absolute inset-0 transition-all duration-1000 ease-out ${
+                    index === currentSlide ? "opacity-100 scale-100 z-10" : "opacity-0 scale-105 z-0"
                   }`}
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition-transform duration-[2000ms]"
-                  style={{
-                    transform:
-                      index === currentSlide ? "scale(1.03)" : "scale(1)",
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-
-                <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 z-20">
-                  <span className="inline-block rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-yellow-500 mb-4">
-                    {item.type}
-                  </span>
-                  <h3 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-300 text-lg max-w-2xl hidden sm:block mb-6">
-                    {item.excerpt}
-                  </p>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => setSelectedItem(item)}
-                      className="rounded-xl bg-yellow-500 px-6 py-3 font-bold text-black shadow-lg hover:bg-yellow-400 transition-colors"
-                    >
-                      Read More
-                    </button>
-                    {item.type === "Event" && (
+                >
+                  <img
+                    src={item.image || "/placeholder.jpg"}
+                    alt={item.title}
+                    className="h-full w-full object-cover transition-transform duration-[2000ms]"
+                    style={{
+                      transform: index === currentSlide ? "scale(1.03)" : "scale(1)",
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-12 z-20">
+                    <span className="inline-block rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 px-3 sm:px-4 py-1 sm:py-1.5 text-xs font-bold uppercase tracking-wider text-yellow-500 mb-3 sm:mb-4">
+                      {item.type === "event" ? "Event" : "News"}
+                    </span>
+                    <h3 className="text-2xl sm:text-5xl font-extrabold text-white mb-2 sm:mb-4 leading-tight line-clamp-2 sm:line-clamp-3">
+                      {item.title}
+                    </h3>
+                    <p className="text-gray-300 text-sm sm:text-lg max-w-2xl hidden sm:block mb-6">
+                      {item.excerpt || item.content?.substring(0, 120)}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                       <button
-                        onClick={(e) => handleSetReminder(item, e)}
-                        className="rounded-xl border border-white/20 bg-white/5 backdrop-blur-md px-6 py-3 font-bold text-white hover:border-yellow-500 hover:text-yellow-500 transition-all"
+                        onClick={() => setSelectedItem(item)}
+                        className="rounded-lg sm:rounded-xl bg-yellow-500 px-4 sm:px-6 py-2 sm:py-3 font-bold text-black text-sm sm:text-base shadow-lg hover:bg-yellow-400 transition-colors"
                       >
-                        Remind Me
+                        Read More
                       </button>
-                    )}
+                      {item.type === "event" && (
+                        <button
+                          onClick={(e) => handleSetReminder(item, e)}
+                          className="rounded-lg sm:rounded-xl border border-white/20 bg-white/5 backdrop-blur-md px-4 sm:px-6 py-2 sm:py-3 font-bold text-white text-sm sm:text-base hover:border-yellow-500 hover:text-yellow-500 transition-all"
+                        >
+                          Remind Me
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:bg-yellow-500 hover:text-black hover:border-yellow-500 opacity-0 group-hover:opacity-100"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:bg-yellow-500 hover:text-black hover:border-yellow-500 opacity-0 group-hover:opacity-100"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-
-            <div className="absolute bottom-6 right-8 z-30 flex gap-2">
-              {featuredContent.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`h-2.5 rounded-full transition-all duration-500 ${idx === currentSlide
-                      ? "w-10 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.5)]"
-                      : "w-2.5 bg-white/30 hover:bg-white/60"
-                    }`}
-                />
               ))}
+
+              <button
+                onClick={prevSlide}
+                className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-30 flex h-10 sm:h-12 w-10 sm:w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:bg-yellow-500 hover:text-black hover:border-yellow-500 opacity-0 group-hover:opacity-100"
+              >
+                <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-30 flex h-10 sm:h-12 w-10 sm:w-12 items-center justify-center rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:bg-yellow-500 hover:text-black hover:border-yellow-500 opacity-0 group-hover:opacity-100"
+              >
+                <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <div className="absolute bottom-6 right-4 sm:right-8 z-30 flex gap-1.5 sm:gap-2">
+                {liveItems.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`h-2 sm:h-2.5 rounded-full transition-all duration-500 ${
+                      idx === currentSlide
+                        ? "w-8 sm:w-10 bg-yellow-500 shadow-[0_0_12px_rgba(234,179,8,0.5)]"
+                        : "w-2 sm:w-2.5 bg-white/30 hover:bg-white/60"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-8 text-center md:hidden">
             <Link
-              to="/events"
+              to="/news-events"
               className="inline-block rounded-xl border border-yellow-500 text-yellow-500 font-bold px-6 py-3 hover:bg-yellow-500 hover:text-black transition-all"
             >
               View All Events
@@ -633,7 +550,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ==================== FAQ SECTION ==================== */}
+      {/* ==================== FAQ SECTION (unchanged) ==================== */}
       <section className="relative bg-zinc-950 py-24 border-t border-white/5">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16" data-reveal>
@@ -662,7 +579,7 @@ export default function Home() {
                   className="flex w-full items-center justify-between p-6 text-left focus:outline-none"
                 >
                   <h3
-                    className={`font-bold text-lg transition-colors duration-300 ${openFaq === index ? "text-yellow-500" : "text-white"
+                    className={`font-bold text-base sm:text-lg transition-colors duration-300 ${openFaq === index ? "text-yellow-500" : "text-white"
                       }`}
                   >
                     {faq.question}
@@ -673,18 +590,8 @@ export default function Home() {
                         : "bg-transparent text-gray-400 border-white/10"
                       }`}
                   >
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                   </span>
                 </button>
@@ -702,24 +609,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ==================== CTA ==================== */}
+      {/* ==================== CTA (unchanged) ==================== */}
       <section className="relative overflow-hidden bg-yellow-500 py-24 text-center text-black">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10" />
         <div className="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-white/20 blur-3xl" />
         <div className="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-black/10 blur-3xl" />
 
         <div className="relative z-10 max-w-3xl mx-auto px-6" data-reveal>
-          <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6">
             Make a Lasting Impact Today
           </h2>
-          <p className="text-black/80 text-lg mb-10 font-medium">
+          <p className="text-black/80 text-base sm:text-lg mb-8 sm:mb-10 font-medium">
             Your support ensures that the next generation of Nambale Magnet
             students have the resources they need to succeed. Every contribution
             builds our legacy.
           </p>
           <Link
             to="/donations"
-            className="inline-block rounded-xl bg-black px-10 py-4 font-bold text-yellow-500 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:bg-zinc-900"
+            className="inline-block rounded-xl bg-black px-8 sm:px-10 py-3 sm:py-4 font-bold text-yellow-500 text-sm sm:text-base shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:bg-zinc-900"
           >
             Donate to the Endowment
           </Link>
@@ -738,85 +645,64 @@ export default function Home() {
               onClick={() => setSelectedItem(null)}
               className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-gray-300 backdrop-blur-md transition-all hover:bg-yellow-500 hover:text-black"
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="h-64 sm:h-80 w-full relative shrink-0">
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent z-10" />
-              <img
-                src={selectedItem.image}
-                alt={selectedItem.title}
-                className="h-full w-full object-cover"
-              />
-            </div>
+            {selectedItem.image && (
+              <div className="h-48 sm:h-64 md:h-80 w-full relative shrink-0">
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent z-10" />
+                <img src={selectedItem.image} alt={selectedItem.title} className="h-full w-full object-cover" />
+              </div>
+            )}
 
-            <div className="p-8 overflow-y-auto -mt-16 relative z-20">
-              <span className="inline-block rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-yellow-500 mb-3">
-                {selectedItem.type}
+            <div className={`p-6 sm:p-8 overflow-y-auto ${selectedItem.image ? "-mt-12 sm:-mt-16" : ""} relative z-20`}>
+              <span className="inline-block rounded-full bg-yellow-500/20 backdrop-blur-md border border-yellow-500/30 px-3 sm:px-4 py-1 sm:py-1.5 text-xs font-bold uppercase tracking-wider text-yellow-500 mb-2 sm:mb-3">
+                {selectedItem.type === "event" ? "Upcoming Event" : "Alumni News"}
               </span>
-              <h2 className="text-3xl font-extrabold text-white mb-4">
-                {selectedItem.title}
-              </h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">{selectedItem.title}</h2>
 
-              <div className="rounded-xl bg-white/5 border border-white/5 p-5 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <span className="text-xs font-bold uppercase text-gray-500">
-                    Date
-                  </span>
-                  <p className="text-yellow-500 font-medium">
-                    {selectedItem.date}
-                  </p>
+              {selectedItem.type === "event" && (
+                <div className="rounded-xl bg-white/5 border border-white/5 p-4 sm:p-5 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-xs font-bold uppercase text-gray-500">Date & Time</span>
+                    <p className="text-white font-medium">{formatDate(selectedItem.date)}</p>
+                    {selectedItem.time && <p className="text-yellow-500 text-sm">{selectedItem.time}</p>}
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold uppercase text-gray-500">Location</span>
+                    <p className="text-white font-medium">{selectedItem.location || "TBA"}</p>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-xs font-bold uppercase text-gray-500">
-                    Location
-                  </span>
-                  <p className="text-white font-medium">
-                    {selectedItem.location}
-                  </p>
-                </div>
+              )}
+
+              {selectedItem.type === "news" && (
+                <p className="text-yellow-500 text-sm font-bold mb-6">{formatDate(selectedItem.date)}</p>
+              )}
+
+              <div className="text-gray-300 leading-relaxed space-y-4 text-sm sm:text-base">
+                <p>{selectedItem.content || selectedItem.excerpt}</p>
               </div>
 
-              <div className="text-gray-300 leading-relaxed space-y-4">
-                <p>{selectedItem.content}</p>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-white/5 flex gap-4">
-                {selectedItem.type === "Event" ? (
+              <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                {selectedItem.type === "event" ? (
                   <>
                     <button
                       onClick={(e) => {
                         handleSetReminder(selectedItem, e);
                         setSelectedItem(null);
                       }}
-                      className="rounded-xl bg-yellow-500 px-6 py-3 font-bold text-black hover:bg-yellow-400 transition-colors flex-1"
+                      className="rounded-lg sm:rounded-xl bg-yellow-500 px-4 sm:px-6 py-2 sm:py-3 font-bold text-black hover:bg-yellow-400 transition-colors flex-1"
                     >
                       Set Reminder
                     </button>
-                    <Link
-                      to="/contact"
-                      className="rounded-xl border border-white/20 bg-white/5 px-6 py-3 font-bold text-white hover:border-yellow-500 hover:text-yellow-500 transition-all flex-1 text-center"
-                    >
-                      Register
-                    </Link>
+                    <button className="rounded-lg sm:rounded-xl border border-white/20 bg-white/5 px-4 sm:px-6 py-2 sm:py-3 font-bold text-white hover:border-yellow-500 hover:text-yellow-500 transition-all flex-1">
+                      Register Now
+                    </button>
                   </>
                 ) : (
-                  <button
-                    onClick={() => setSelectedItem(null)}
-                    className="rounded-xl bg-white/10 px-6 py-3 font-bold text-white hover:bg-white/20 transition-colors w-full"
-                  >
+                  <button className="rounded-lg sm:rounded-xl bg-white/10 px-4 sm:px-6 py-2 sm:py-3 font-bold text-white hover:bg-white/20 transition-colors w-full">
                     Close
                   </button>
                 )}
@@ -859,8 +745,23 @@ export default function Home() {
           transform: translateY(0);
         }
 
-        .overflow-hidden {
-          transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+          .line-clamp-2 {
+            -webkit-line-clamp: 1;
+          }
         }
       `}</style>
     </div>
