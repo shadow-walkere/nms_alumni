@@ -13,6 +13,7 @@ import {
   Video,
   ChevronLeft,
   ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -27,8 +28,9 @@ const AlumniGallery = () => {
   const [mediaItems, setMediaItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [hoveredId, setHoveredId] = useState(null);
 
-  // Lightbox state – now includes current index for slider navigation
+  // Lightbox state
   const [lightbox, setLightbox] = useState({
     isOpen: false,
     currentIndex: 0,
@@ -43,7 +45,6 @@ const AlumniGallery = () => {
     { id: "videos", label: "Videos", icon: <Video size={16} /> },
   ];
 
-  // Open lightbox at a specific index
   const openLightbox = (index) => {
     setLightbox({ isOpen: true, currentIndex: index });
     document.body.style.overflow = "hidden";
@@ -54,7 +55,6 @@ const AlumniGallery = () => {
     document.body.style.overflow = "auto";
   };
 
-  // Navigate lightbox
   const goToPrev = (e) => {
     if (e) e.stopPropagation();
     setLightbox((prev) => ({
@@ -118,55 +118,80 @@ const AlumniGallery = () => {
   const currentItem = mediaItems[lightbox.currentIndex] || {};
 
   return (
-    <div className="bg-slate-50 overflow-x-hidden min-h-screen font-sans selection:bg-blue-200">
-      {/* HERO */}
-      <section className="relative h-[45vh] min-h-[350px] flex items-center justify-center overflow-hidden bg-slate-900">
-        <div className="absolute inset-0 opacity-40">
-          <div className="w-full h-full bg-gradient-to-r from-blue-700 to-indigo-800"></div>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-slate-900/30"></div>
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center pt-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-blue-200 text-xs font-bold uppercase tracking-widest mb-4">
-            <ImageIcon size={14} /> Alumni Gallery
+    <div className="bg-black overflow-x-hidden min-h-screen font-sans selection:bg-yellow-500 selection:text-black">
+      {/* HERO SECTION */}
+      <section className="relative h-screen md:h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden">
+        {/* Dynamic background with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black z-0" />
+        
+        {/* Animated gradient orbs */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-yellow-500/20 rounded-full blur-3xl animate-pulse z-0" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl animate-pulse z-0" />
+
+        {/* Grid pattern overlay */}
+        <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(234,179,8,0.05)_1px,transparent_1px)] bg-[length:40px_40px] z-0" />
+
+        {/* Content */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 backdrop-blur-md border border-yellow-500/30 text-yellow-400 text-xs font-bold uppercase tracking-widest mb-6 animate-fade-in-up"
+               style={{ animation: "fadeInUp 0.6s ease-out" }}>
+            <Sparkles size={14} /> Alumni Gallery
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">
-            Our Alumni,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-500">
-              One Community
+          
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-tight animate-fade-in-up"
+              style={{ animation: "fadeInUp 0.6s ease-out 0.1s both" }}>
+            Our Alumni,
+            <br />
+            <span className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-amber-500 bg-clip-text text-transparent">
+              One Legacy
             </span>
           </h1>
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-light">
-            Relive the moments that keep us connected — reunions, professional
-            milestones, and shared successes.
+          
+          <p className="text-base md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed font-light mb-8 animate-fade-in-up"
+             style={{ animation: "fadeInUp 0.6s ease-out 0.2s both" }}>
+            Relive the moments that define us — reunions, mentorship, achievements, and the connections that last forever.
           </p>
+
+          {/* Scroll indicator */}
+          <div className="animate-bounce mt-6 inline-block">
+            <svg className="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
         </div>
       </section>
 
-      {/* FILTER BAR */}
-      <div className="sticky top-0 z-40 bg-slate-50/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+      {/* FILTER BAR - STICKY & ENHANCED */}
+      <div className="sticky top-0 z-40 bg-black/90 backdrop-blur-xl border-b border-yellow-500/20 shadow-xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="relative w-full md:w-64 md:order-2">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            {/* Search Bar */}
+            <div className="relative w-full md:w-72 md:order-2">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-yellow-500/60 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Search memories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-sm font-medium text-slate-700 shadow-sm transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-zinc-900/50 border border-yellow-500/20 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/30 outline-none text-sm font-medium text-white placeholder-gray-500 shadow-md transition-all"
               />
             </div>
+
+            {/* Tabs */}
             <div className="w-full md:w-auto overflow-x-auto no-scrollbar md:order-1">
               <div className="flex items-center gap-2 pb-1 md:pb-0">
-                {tabs.map((tab) => (
+                {tabs.map((tab, idx) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all duration-300 transform active:scale-95 ${
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 transform active:scale-95 ${
                       activeTab === tab.id
-                        ? "bg-indigo-900 text-white shadow-md ring-2 ring-indigo-900 ring-offset-2 ring-offset-slate-50"
-                        : "bg-white text-slate-600 border border-slate-200 hover:border-blue-300 hover:text-blue-700"
+                        ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-black shadow-lg shadow-yellow-500/30 ring-2 ring-yellow-500"
+                        : "bg-zinc-800/50 text-gray-300 border border-yellow-500/20 hover:border-yellow-500/60 hover:text-yellow-400"
                     }`}
+                    style={{
+                      animation: activeTab === tab.id ? "popIn 0.3s ease-out" : "none"
+                    }}
                   >
                     {tab.icon} {tab.label}
                   </button>
@@ -177,75 +202,95 @@ const AlumniGallery = () => {
         </div>
       </div>
 
-      {/* GALLERY GRID – exactly 3 columns on desktop */}
-      <section className="px-4 md:px-8 py-12 min-h-[50vh]">
+      {/* GALLERY GRID */}
+      <section className="px-4 md:px-6 py-16 min-h-screen bg-black">
         <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-              <p className="text-slate-500 font-medium animate-pulse">
+            <div className="flex flex-col items-center justify-center py-32">
+              <div className="relative w-16 h-16 mb-6">
+                <Loader2 className="w-16 h-16 text-yellow-500 animate-spin" />
+                <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full animate-pulse" />
+              </div>
+              <p className="text-gray-400 font-semibold animate-pulse">
                 Loading memories...
               </p>
             </div>
           ) : mediaItems.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 mx-auto max-w-2xl">
-              <Filter size={40} className="mx-auto text-slate-400 mb-4" />
-              <h3 className="text-lg font-bold text-slate-700">
+            <div className="text-center py-32 bg-gradient-to-br from-zinc-900 to-black rounded-3xl border-2 border-dashed border-yellow-500/30 mx-auto max-w-2xl">
+              <Filter size={48} className="mx-auto text-yellow-500/40 mb-4" />
+              <h3 className="text-2xl font-bold text-white">
                 No memories found
               </h3>
-              <p className="text-slate-500 mt-2">
+              <p className="text-gray-400 mt-3 text-base">
                 {searchQuery
                   ? "Try a different search term"
                   : "No media available in this category yet"}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {mediaItems.map((item, idx) => (
                 <div
                   key={item._id}
-                  className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-slate-100 hover:border-blue-100"
+                  className="group relative bg-gradient-to-br from-zinc-800 to-black rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer border border-yellow-500/10 hover:border-yellow-500/40"
                   onClick={() => openLightbox(idx)}
+                  onMouseEnter={() => setHoveredId(item._id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  style={{
+                    animation: `slideInUp 0.5s ease-out ${idx * 0.1}s both`,
+                    transform: hoveredId === item._id ? "translateY(-8px)" : "translateY(0)"
+                  }}
                 >
-                  <div className="relative overflow-hidden">
+                  <div className="relative overflow-hidden aspect-video bg-black">
                     {item.type === "video" ? (
-                      <div className="relative aspect-video bg-slate-900 flex items-center justify-center">
+                      <>
                         <video
                           src={item.url}
-                          className="w-full h-full object-cover opacity-70"
+                          className="w-full h-full object-cover opacity-60 transition-opacity duration-500 group-hover:opacity-100"
                           muted
                           preload="metadata"
                         />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <PlayCircle className="w-8 h-8 text-white fill-current" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors duration-300">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-300" />
+                            <div className="relative w-16 h-16 bg-yellow-500/30 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <PlayCircle className="w-8 h-8 text-yellow-300 fill-current" />
+                            </div>
                           </div>
                         </div>
-                        <span className="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded font-bold uppercase tracking-wider">
+                        <span className="absolute top-3 right-3 bg-black/70 text-yellow-400 text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">
                           Video
                         </span>
-                      </div>
+                      </>
                     ) : (
                       <img
                         src={item.url}
                         alt={item.title}
-                        className="w-full h-64 object-cover transform transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                         loading="lazy"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 
-                  <div className="absolute bottom-0 left-0 w-full p-5 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
-                    <span className="inline-block px-2 py-0.5 bg-blue-600/90 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider rounded-md mb-2">
+                  {/* Content overlay */}
+                  <div className="absolute bottom-0 left-0 w-full p-5 translate-y-6 group-hover:translate-y-0 transition-transform duration-300 opacity-0 group-hover:opacity-100">
+                    <span className="inline-block px-3 py-1 bg-gradient-to-r from-yellow-500 to-amber-500 text-black text-[11px] font-bold uppercase tracking-wider rounded-md mb-2.5">
                       {item.category
                         ? item.category.charAt(0).toUpperCase() +
                           item.category.slice(1)
                         : "Alumni"}
                     </span>
-                    <h3 className="text-white font-bold text-sm leading-snug shadow-black drop-shadow-md">
+                    <h3 className="text-white font-black text-sm leading-snug drop-shadow-lg line-clamp-2">
                       {item.title || "Untitled"}
                     </h3>
+                  </div>
+
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   </div>
                 </div>
               ))}
@@ -257,12 +302,13 @@ const AlumniGallery = () => {
       {/* LIGHTBOX WITH SLIDER */}
       {lightbox.isOpen && (
         <div
-          className="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in"
           onClick={closeLightbox}
+          style={{ animation: "fadeIn 0.3s ease-out" }}
         >
           {/* Close button */}
           <button
-            className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+            className="absolute top-4 right-4 p-3 bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-400 rounded-full transition-all duration-300 z-50 hover:scale-110"
             onClick={closeLightbox}
             aria-label="Close lightbox"
           >
@@ -273,14 +319,14 @@ const AlumniGallery = () => {
           {mediaItems.length > 1 && (
             <>
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-400 rounded-full transition-all duration-300 z-50 hover:scale-110 hover:-translate-x-1"
                 onClick={goToPrev}
                 aria-label="Previous"
               >
                 <ChevronLeft size={32} />
               </button>
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-50"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-400 rounded-full transition-all duration-300 z-50 hover:scale-110 hover:translate-x-1"
                 onClick={goToNext}
                 aria-label="Next"
               >
@@ -291,34 +337,35 @@ const AlumniGallery = () => {
 
           {/* Media container */}
           <div
-            className="relative w-full max-w-5xl flex flex-col items-center"
+            className="relative w-full max-w-5xl flex flex-col items-center animate-slide-up"
             onClick={(e) => e.stopPropagation()}
+            style={{ animation: "slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)" }}
           >
             {currentItem.type === "video" ? (
-              <div className="w-full aspect-video max-h-[85vh]">
+              <div className="w-full aspect-video max-h-[85vh] rounded-xl overflow-hidden shadow-2xl shadow-yellow-500/20">
                 <video
                   src={currentItem.url}
                   controls
                   autoPlay
                   muted
-                  className="w-full h-full rounded-lg shadow-2xl"
+                  className="w-full h-full"
                 />
               </div>
             ) : (
               <img
                 src={currentItem.url}
                 alt={currentItem.title}
-                className="max-h-[85vh] w-auto rounded-lg shadow-2xl object-contain"
+                className="max-h-[85vh] w-auto rounded-xl shadow-2xl shadow-yellow-500/20 object-contain"
               />
             )}
 
             {currentItem.title && (
-              <div className="mt-4 text-center">
-                <h3 className="text-lg font-bold text-white tracking-wide">
+              <div className="mt-6 text-center animate-fade-in-up" style={{ animation: "fadeInUp 0.6s ease-out 0.2s both" }}>
+                <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">
                   {currentItem.title}
                 </h3>
-                <p className="text-slate-400 text-sm mt-1">
-                  {lightbox.currentIndex + 1} / {mediaItems.length}
+                <p className="text-gray-400 text-sm mt-2 font-medium">
+                  <span className="text-yellow-500 font-bold">{lightbox.currentIndex + 1}</span> / {mediaItems.length}
                 </p>
               </div>
             )}
@@ -327,21 +374,23 @@ const AlumniGallery = () => {
       )}
 
       {/* FOOTER CTA */}
-      <section className="py-20 bg-white border-t border-slate-100 text-center">
-        <div className="max-w-3xl mx-auto px-6">
-          <h2 className="text-3xl font-black text-slate-900 mb-4">
+      <section className="py-20 md:py-24 bg-gradient-to-b from-black to-zinc-900 border-t border-yellow-500/20 text-center relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(234,179,8,0.1)_0%,transparent_70%)]" />
+        
+        <div className="max-w-3xl mx-auto px-4 md:px-6 relative z-10">
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
             Stay Connected
           </h2>
-          <p className="text-slate-600 mb-8 text-lg">
-            Join our official alumni network to never miss a reunion, event, or
-            update.
+          <p className="text-gray-300 mb-10 text-base md:text-lg leading-relaxed">
+            Join our thriving alumni community to stay updated on reunions, events, mentorship opportunities, and success stories.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4">
             <a
               href="https://facebook.com/groups/alumni"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-[#1877F2] text-white font-bold rounded-full hover:shadow-lg hover:-translate-y-1 transition-all"
+              className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:shadow-xl hover:shadow-yellow-500/30 hover:-translate-y-1 transition-all duration-300 transform active:scale-95"
             >
               Facebook Group
             </a>
@@ -349,13 +398,13 @@ const AlumniGallery = () => {
               href="https://linkedin.com/groups/alumni"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-[#0A66C2] text-white font-bold rounded-full hover:shadow-lg hover:-translate-y-1 transition-all"
+              className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:shadow-xl hover:shadow-yellow-500/30 hover:-translate-y-1 transition-all duration-300 transform active:scale-95"
             >
               LinkedIn Network
             </a>
             <a
               href="/alumni/register"
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-full hover:shadow-lg hover:-translate-y-1 transition-all"
+              className="px-8 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-black font-bold rounded-lg hover:shadow-xl hover:shadow-yellow-500/40 hover:-translate-y-1 transition-all duration-300 transform active:scale-95"
             >
               Alumni Portal
             </a>
@@ -364,12 +413,65 @@ const AlumniGallery = () => {
       </section>
 
       <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes fadeInUp {
+          from { 
+            opacity: 0; 
+            transform: translateY(20px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          }
+        }
+        @keyframes slideUp {
+          from { 
+            opacity: 0; 
+            transform: translateY(40px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          }
+        }
+        @keyframes slideInUp {
+          from { 
+            opacity: 0; 
+            transform: translateY(30px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: translateY(0); 
+          }
+        }
+        @keyframes popIn {
+          from { 
+            transform: scale(0.95); 
+            opacity: 0;
+          }
+          to { 
+            transform: scale(1); 
+            opacity: 1;
+          }
+        }
+
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         .no-scrollbar::-webkit-scrollbar {
           display: none;
         }
         .no-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
+        }
+
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </div>
