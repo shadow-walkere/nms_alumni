@@ -76,9 +76,9 @@ function ManageEvents() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, searchQuery]);
 
-  // ============================================
+ 
   // FILE HANDLING
-  // ============================================
+
   const handleFileChange = (e) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -92,9 +92,8 @@ function ManageEvents() {
     }
   };
 
-  // ============================================
   // FORM OPENERS
-  // ============================================
+
   const openAddForm = () => {
     setEditingItem(null);
     resetForm();
@@ -126,9 +125,9 @@ function ManageEvents() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // ============================================
+
   // SAVE
-  // ============================================
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -184,9 +183,8 @@ function ManageEvents() {
     }
   };
 
-  // ============================================
   // DELETE
-  // ============================================
+
   const handleDelete = async (id, itemTitle) => {
     if (!window.confirm(`Delete "${itemTitle}"? This cannot be undone.`)) return;
     try {
@@ -201,17 +199,16 @@ function ManageEvents() {
     }
   };
 
-  // ============================================
   // COPY
-  // ============================================
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied!");
   };
 
-  // ============================================
+  
   // RENDER
-  // ============================================
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Decorative background circles */}

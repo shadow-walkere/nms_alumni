@@ -8,7 +8,7 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollTop";
 
 import Auth from "./page/Auth";
-import Donations from "./page/Donation";
+// import Donations from "./page/Donation";
 import Gallery from "./page/Gallery";
 import NewsEvents from "./page/Events";
 import Contact from "./page/ContactUs";
@@ -109,7 +109,7 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/donations" element={<Donations />} />
+          {/* <Route path="/donations" element={<Donations />} /> */}
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<AboutUs />} />
           

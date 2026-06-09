@@ -97,6 +97,7 @@ const galleryRoutes = require('./routes/GalleryRoute');
 const newsEventsRoutes = require('./routes/NewsEvents');
 const alumniRoutes = require('./routes/AlumniRoute');
 
+
 const app = express();
 
 // CORS Configuration
@@ -108,7 +109,7 @@ const allowedOrigins = [
 
 
 // Middleware
-app.use(cors());
+
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -133,6 +134,7 @@ app.use('/api/visitors', visitorRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/news-events', newsEventsRoutes);
 app.use('/api/alumni', alumniRoutes);
+
 
 // Database Connection & Initial Setup
 mongoose.connect(process.env.MONGO_URI)

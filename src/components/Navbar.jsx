@@ -82,12 +82,12 @@ export default function Navbar() {
           </ul>
 
           <div className="flex items-center gap-4 pl-6 border-l border-zinc-800">
-            <Link
+            {/* <Link
               to="/donations"
               className="text-sm font-bold text-gray-300 hover:text-yellow-500 transition-colors"
             >
               Donate
-            </Link>
+            </Link> */}
             <Link
               to="/auth"
               className="bg-yellow-500 text-black px-6 py-2 rounded-full text-sm font-extrabold hover:bg-yellow-400 hover:scale-105 hover:shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all duration-300"
