@@ -90,9 +90,8 @@ const bcrypt = require('bcryptjs');
 const Admin = require('./models/Admin');
 
 // Route Files
-// const authRoutes = require('./routes/auth'); 
 const adminRoutes = require('./routes/AdminRoutes');
-const visitorRoutes = require('./routes/VisitorRoutes'); 
+const visitorRoutes = require('./routes/VisitorRoutes');
 const galleryRoutes = require('./routes/GalleryRoute');
 const newsEventsRoutes = require('./routes/NewsEvents');
 const alumniRoutes = require('./routes/AlumniRoute');
@@ -100,52 +99,53 @@ const alumniRoutes = require('./routes/AlumniRoute');
 
 const app = express();
 
+
 // CORS Configuration
+
 const allowedOrigins = [
-  "http://localhost:3000", // For development
-  "http://localhost:3001", // For development
-  "https://nms-alumni.onrender.com",
+  "http://localhost:3000",                     // Local dev (React)
+  "http://localhost:3001",
+  "https://nms-alumni.onrender.com",           // Your deployed frontend
+
 ];
-
-
-// Middleware
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      console.log("Origin:", origin); // Log the origin to check the requests
+      // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.warn(`Blocked by CORS: ${origin}`);
         callback(new Error("Not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "*"],
-    credentials: true, // Allow cookies or credentials if necessary
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],   // ✅ Removed invalid "*"
+    credentials: true,
   })
 );
 app.use(express.json());
 
 // Mount Routes
-// app.use('/api/auth', authRoutes);
+
 app.use('/api/admin', adminRoutes);
 app.use('/api/visitors', visitorRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/news-events', newsEventsRoutes);
 app.use('/api/alumni', alumniRoutes);
+// ✅ Leadership routes mounted
 
 
-// Database Connection & Initial Setup
+// Database Connection & Admin Setup
+
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('MongoDB successfully connected');
-    
-    // Automatic Admin Creation
+
     const adminUsername = process.env.ADMIN_USERNAME || 'Admin';
     const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@1234';
 
-    // Case-insensitive check to see if admin already exists
     const adminExists = await Admin.findOne({
       username: { $regex: new RegExp(`^${adminUsername}$`, 'i') }
     });
@@ -180,4 +180,3 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-// Trigger nodemon restart: 3
