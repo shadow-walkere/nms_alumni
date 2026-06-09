@@ -620,16 +620,16 @@ export default function Home() {
             Make a Lasting Impact Today
           </h2>
           <p className="text-black/80 text-base sm:text-lg mb-8 sm:mb-10 font-medium">
-            Your support ensures that the next generation of Nambale Magnet
-            students have the resources they need to succeed. Every contribution
-            builds our legacy.
+          Belonging builds our future. Your presence strengthens the deep bonds that connect our global family. Together, we ensure every Nambale Magnet student grows up surrounded by love, guidance, and a supportive network. Every connection we make expands our united community and secures a shared legacy.
+
+        
           </p>
-          <Link
+          {/* <Link
             to="/donations"
             className="inline-block rounded-xl bg-black px-8 sm:px-10 py-3 sm:py-4 font-bold text-yellow-500 text-sm sm:text-base shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:bg-zinc-900"
           >
             Donate to the Endowment
-          </Link>
+          </Link> */}
         </div>
       </section>
 
