@@ -105,6 +105,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",                     // Local dev (React)
   "http://localhost:3001",
+  "http://localhost:3002",
   "https://nms-alumni.onrender.com",           // Your deployed frontend
 
 ];
