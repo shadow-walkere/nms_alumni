@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import SERVER_URL from "./config";
 
 // --- PUBLIC COMPONENTS ---
 import Home from "./page/Home";
@@ -54,10 +55,7 @@ function AdminProtectedRoute({ children }) {
  * LAYOUT
  * ───────────────────────────────────────────────────────── */
 
-const SERVER_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) || 
-  "http://localhost:5000";
+
 
 function PublicLayout() {
   useEffect(() => {

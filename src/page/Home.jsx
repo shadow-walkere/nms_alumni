@@ -2,11 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
-
-const SERVER_URL =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SERVER_URL) ||
-  (typeof process !== "undefined" && process.env?.REACT_APP_SERVER_URL) ||
-  "http://localhost:5000";
+import SERVER_URL from "../config";
 
 /* ============================================================
    DATA – Hero Slider (unchanged)

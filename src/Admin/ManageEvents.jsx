@@ -13,11 +13,7 @@ import {
   Copy,
   Sparkles,
 } from "lucide-react";
-
-const SERVER_URL =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_SERVER_URL) ||
-  (typeof process !== "undefined" && process.env?.REACT_APP_SERVER_URL) ||
-  "http://localhost:5000";
+import SERVER_URL from "../config";
 
 const TABS = [
   { id: "news", label: "News", icon: <Newspaper size={16} /> },

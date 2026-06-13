@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, Users, GraduationCap, MapPin, Briefcase, Mail, Phone, ChevronDown, ChevronUp, Loader2, Sparkles } from "lucide-react";
-
-const SERVER_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) || 
-  "http://localhost:5000";
+import SERVER_URL from "../config";
 
 const placeholderImage = "https://ui-avatars.com/api/?name=Alumni&background=EAB308&color=000&size=150";
 

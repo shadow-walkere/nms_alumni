@@ -175,6 +175,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, Loader } from "lucide-react";
+import SERVER_URL from "../config";
 import {
   BarChart,
   Bar,
@@ -186,11 +187,7 @@ import {
   Legend,
 } from "recharts";
 
-// SAFEGUARD: Same URL logic from AdminLogin
-const SERVER_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) || 
-  "http://localhost:5000";
+
 
 const UsersDetails = () => {
   const [visitorCount, setVisitorCount] = useState(0);

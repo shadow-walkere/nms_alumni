@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Send } from "lucide-react";
 import { toast } from "react-hot-toast";
+import SERVER_URL from "../config";
 
 /* ─── Custom Scroll‑Reveal Hook ─── */
 const useScrollReveal = (threshold = 0.1) => {
@@ -45,7 +46,7 @@ export default function Contact() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/contact/send-mail`,
+        `${SERVER_URL}/api/contact/send-mail`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

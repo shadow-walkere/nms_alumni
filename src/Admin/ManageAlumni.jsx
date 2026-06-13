@@ -4,11 +4,7 @@ import toast from "react-hot-toast";
 import {
   Plus, Trash2, Edit3, Upload, X, Loader2, GraduationCap, Search, Sparkles
 } from "lucide-react";
-
-const SERVER_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) || 
-  "http://localhost:5000";
+import SERVER_URL from "../config";
 
 const CLASS_YEARS = Array.from({ length: 2030 - 2000 + 1 }, (_, i) => 2000 + i);
 

@@ -17,8 +17,7 @@ import {
   Sparkles,
   Edit3,
 } from "lucide-react";
-
-const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+import SERVER_URL from "../config";
 
 const TABS = [
   { id: "all", label: "All Media", icon: <Layers size={16} /> },

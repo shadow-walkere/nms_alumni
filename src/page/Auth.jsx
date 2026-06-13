@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
+import SERVER_URL from "../config";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -29,8 +30,8 @@ export default function Auth() {
 
     try {
       const url = isLogin
-        ? "http://localhost:5000/api/auth/login"
-        : "http://localhost:5000/api/auth/signup";
+        ? `${SERVER_URL}/api/auth/login`
+        : `${SERVER_URL}/api/auth/signup`;
 
       const res = await axios.post(url, form);
 

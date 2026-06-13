@@ -487,12 +487,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import SERVER_URL from "../config";
 
-// Dynamic server URL – works on Render and locally
-const SERVER_URL =
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) ||
-  "http://localhost:5000";
+
 
 /* ── Custom Scroll‑Reveal Hook ── */
 const useScrollReveal = (threshold = 0.1) => {

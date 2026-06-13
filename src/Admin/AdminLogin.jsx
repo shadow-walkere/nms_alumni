@@ -3,12 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { User, Lock, ShieldCheck, ArrowLeft, AlertCircle } from "lucide-react";
-
-// SAFEGUARD: This checks for Vite, then Create React App, and falls back to localhost:5000
-const SERVER_URL = 
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_SERVER_URL) ||
-  (typeof process !== 'undefined' && process.env && process.env.REACT_APP_SERVER_URL) || 
-  "http://localhost:5000";
+import SERVER_URL from "../config";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");

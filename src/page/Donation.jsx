@@ -1,4 +1,5 @@
 import { useState } from "react";
+import SERVER_URL from "../config";
 
 export default function DonationsPage() {
   const [form, setForm] = useState({
@@ -51,7 +52,7 @@ export default function DonationsPage() {
       setStatus({ type: "info", msg: "Sending STK Push to your phone..." });
 
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/mpesa/stkpush`,
+        `${SERVER_URL}/api/mpesa/stkpush`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
