@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 
 /* ── Data (unchanged) ─────────────────────────────────────────────────────── */
 const constitutionChapters = [
-  { id: 1, title: "Chapter 1: Name & Registration", description: "Official name, legal status, and registration details of the Nambale Magnet School Alumni Association.", icon: "🏛️", file: "/documents/constitution/chapter1.pdf" },
-  { id: 2, title: "Chapter 2: Objectives & Goals", description: "The core objectives that guide our alumni network and the goals we collectively pursue.", icon: "🎯", file: "/documents/constitution/chapter2.pdf" },
-  { id: 3, title: "Chapter 3: Membership", description: "Eligibility criteria, categories of membership, rights, duties, and subscription fees.", icon: "🤝", file: "/documents/constitution/chapter3.pdf" },
-  { id: 4, title: "Chapter 4: Governance & Leadership", description: "Structure of the governing body, elections, terms of office, and leadership responsibilities.", icon: "⚖️", file: "/documents/constitution/chapter4.pdf" },
-  { id: 5, title: "Chapter 5: Meetings & Quorum", description: "Rules governing general meetings, special meetings, notice periods, and quorum requirements.", icon: "📋", file: "/documents/constitution/chapter5.pdf" },
-  { id: 6, title: "Chapter 6: Finance & Auditing", description: "Management of funds, financial year, auditing procedures, and accountability measures.", icon: "💰", file: "/documents/constitution/chapter6.pdf" },
-  { id: 7, title: "Chapter 7: Amendments & Dissolution", description: "Procedures for amending the constitution and provisions for dissolution of the association.", icon: "📜", file: "/documents/constitution/chapter7.pdf" },
+  { id: 1, title: "Chapter 1: Name & Registration", description: "Official name, legal status, and registration details of the Nambale Magnet School Alumni Association.", icon: "🏛️" },
+  { id: 2, title: "Chapter 2: Objectives & Goals", description: "The core objectives that guide our alumni network and the goals we collectively pursue.", icon: "🎯" },
+  { id: 3, title: "Chapter 3: Membership", description: "Eligibility criteria, categories of membership, rights, duties, and subscription fees.", icon: "🤝" },
+  { id: 4, title: "Chapter 4: Governance & Leadership", description: "Structure of the governing body, elections, terms of office, and leadership responsibilities.", icon: "⚖️" },
+  { id: 5, title: "Chapter 5: Meetings & Quorum", description: "Rules governing general meetings, special meetings, notice periods, and quorum requirements.", icon: "📋" },
+  { id: 6, title: "Chapter 6: Finance & Auditing", description: "Management of funds, financial year, auditing procedures, and accountability measures.", icon: "💰" },
+  { id: 7, title: "Chapter 7: Amendments & Dissolution", description: "Procedures for amending the constitution and provisions for dissolution of the association.", icon: "📜" },
 ];
 
 const leadershipTeam = [
@@ -40,69 +40,20 @@ const useScrollReveal = (threshold = 0.1) => {
   }, [threshold]);
 };
 
-/* ── Sub-components ───────────────────────────────────────────────────────── */
-const ChapterCard = ({ chapter }) => {
-  const [downloading, setDownloading] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
-
-  const handleDownload = () => {
-    setDownloading(true);
-    setTimeout(() => {
-      setDownloading(false);
-      setDownloaded(true);
-      setTimeout(() => setDownloaded(false), 3000);
-    }, 1200);
-  };
-
-  return (
-    <div className="group relative rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-yellow-500/40 hover:shadow-[0_20px_50px_rgba(234,179,8,0.08)]">
-      <div className="flex items-start gap-4 mb-4">
-        <span className="text-2xl">{chapter.icon}</span>
-        <div>
-          <h4 className="text-white font-semibold text-base group-hover:text-yellow-400 transition-colors">
-            {chapter.title}
-          </h4>
-          <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">{chapter.description}</p>
-        </div>
+/* ── Sub‑components ───────────────────────────────────────────────────────── */
+const ChapterCard = ({ chapter }) => (
+  <div className="group relative rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-yellow-500/40 hover:shadow-[0_20px_50px_rgba(234,179,8,0.08)]">
+    <div className="flex items-start gap-4">
+      <span className="text-2xl">{chapter.icon}</span>
+      <div>
+        <h4 className="text-white font-semibold text-base group-hover:text-yellow-400 transition-colors">
+          {chapter.title}
+        </h4>
+        <p className="text-gray-400 text-sm mt-1.5 leading-relaxed">{chapter.description}</p>
       </div>
-      <button
-        onClick={handleDownload}
-        disabled={downloading}
-        className={`mt-4 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 ${
-          downloaded
-            ? "bg-green-600/20 border border-green-500/30 text-green-400"
-            : downloading
-            ? "bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 cursor-wait"
-            : "bg-transparent border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500 hover:text-black hover:border-yellow-500"
-        }`}
-      >
-        {downloading ? (
-          <>
-            <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-            Preparing…
-          </>
-        ) : downloaded ? (
-          <>
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            Downloaded!
-          </>
-        ) : (
-          <>
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-            </svg>
-            Download PDF
-          </>
-        )}
-      </button>
     </div>
-  );
-};
+  </div>
+);
 
 const LeaderCard = ({ leader }) => (
   <div className="group relative rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-sm p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-yellow-500/40 hover:shadow-[0_20px_50px_rgba(234,179,8,0.08)]">
@@ -302,8 +253,7 @@ const AboutUs = () => {
               <h2 className="text-4xl font-bold text-yellow-500">School Constitution</h2>
               <p className="text-gray-400 mt-3 max-w-2xl text-lg">
                 The NMS Alumni Association is governed by a formal constitution ratified at the
-                founding AGM. Click any chapter below to download it as a PDF, or download the
-                full document in one go.
+                founding AGM. Download the full document below.
               </p>
             </div>
 
