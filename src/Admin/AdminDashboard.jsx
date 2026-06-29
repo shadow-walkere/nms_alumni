@@ -29,16 +29,17 @@ const AdminDashboard = () => {
     { to: "gallery", label: "Manage Gallery", icon: <ImageIcon className="w-5 h-5" /> },
     { to: "events", label: "Manage Events & News", icon: <CalendarDays className="w-5 h-5" /> },
     { to: "mentorships", label: "Mentorships", icon: <Briefcase className="w-5 h-5" /> },
-    { to: "donations", label: "Donations", icon: <HeartHandshake className="w-5 h-5" /> },
+    // { to: "donations", label: "Donations", icon: <HeartHandshake className="w-5 h-5" /> },
     { to: "testimonials", label: "Testimonials", icon: <MessageSquareQuote className="w-5 h-5" /> },
+    { to: "faqs", label: "Manage FAQ", icon: <MessageSquareQuote className="w-5 h-5" /> },
   ];
 
   return (
     <div className="flex h-screen bg-black font-sans text-gray-300 overflow-hidden selection:bg-yellow-500 selection:text-black">
-      
+
       {/* ─────────── Mobile Backdrop ─────────── */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-20 md:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -81,8 +82,8 @@ const AdminDashboard = () => {
                   onClick={() => setIsSidebarOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-3 font-medium transition-all duration-200 px-4 py-3 rounded-xl
-                    ${isActive 
-                      ? "bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.2)]" 
+                    ${isActive
+                      ? "bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.2)]"
                       : "text-gray-400 hover:text-white hover:bg-zinc-900"
                     }`
                   }
@@ -109,15 +110,15 @@ const AdminDashboard = () => {
 
       {/* ─────────── Main Content Area ─────────── */}
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-black relative">
-        
+
         {/* Subtle Background Elements */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-yellow-500/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
         {/* Mobile Header */}
         <header className="h-20 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between px-6 md:hidden sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-3">
-             <GraduationCap className="w-6 h-6 text-yellow-500" />
-             <h1 className="text-lg font-bold text-white">Dashboard</h1>
+            <GraduationCap className="w-6 h-6 text-yellow-500" />
+            <h1 className="text-lg font-bold text-white">Dashboard</h1>
           </div>
           <button
             onClick={() => setIsSidebarOpen(true)}
@@ -135,7 +136,8 @@ const AdminDashboard = () => {
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fade-in-up { 
           from { opacity: 0; transform: translateY(10px); } 
           to { opacity: 1; transform: translateY(0); } 

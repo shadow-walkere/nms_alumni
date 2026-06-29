@@ -24,7 +24,7 @@ import ManageGallery from "./Admin/ManageGallery";
 import ManageEvents from "./Admin/ManageEvents";
 import UsersDetails from "./Admin/UsersDetails";
 import ManageAlumni from "./Admin/ManageAlumni";
-// import AdminFAQs from "./Admin/AdminFAQs";
+import AdminFAQs from "./Admin/AdminFAQs";
 // import AdminTestimonials from "./Admin/AdminTestimonials";
 
 /* ─────────────────────────────────────────────────────────
@@ -153,7 +153,7 @@ function App() {
           <Route path="gallery" element={<ManageGallery />} />
            <Route path="events" element={<ManageEvents />} />
            <Route path="alumni" element={<ManageAlumni />} />
-          {/* <Route path="faqs" element={<AdminFAQs />} /> */}
+          <Route path="faqs" element={<AdminFAQs />} />
           {/* <Route path="testimonials" element={<AdminTestimonials />} /> */}
         </Route>
         

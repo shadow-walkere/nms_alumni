@@ -95,7 +95,7 @@ const visitorRoutes = require('./routes/VisitorRoutes');
 const galleryRoutes = require('./routes/GalleryRoute');
 const newsEventsRoutes = require('./routes/NewsEvents');
 const alumniRoutes = require('./routes/AlumniRoute');
-
+const faqRoutes = require('./routes/FAQRoute.js');
 
 const app = express();
 
@@ -135,6 +135,7 @@ app.use('/api/visitors', visitorRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/news-events', newsEventsRoutes);
 app.use('/api/alumni', alumniRoutes);
+app.use("/api/faq",faqRoutes)
 // ✅ Leadership routes mounted
 
 

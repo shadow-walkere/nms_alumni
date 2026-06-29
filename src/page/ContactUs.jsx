@@ -214,11 +214,10 @@ export default function Contact() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`mt-6 p-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 border backdrop-blur-sm ${
-                  status.type === "success"
+                className={`mt-6 p-4 rounded-xl text-sm font-bold flex items-center justify-center gap-2 border backdrop-blur-sm ${status.type === "success"
                     ? "bg-green-950/40 text-green-400 border-green-900/50"
                     : "bg-red-950/40 text-red-400 border-red-900/50"
-                }`}
+                  }`}
               >
                 {status.message}
               </motion.div>

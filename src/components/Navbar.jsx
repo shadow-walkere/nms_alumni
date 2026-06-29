@@ -205,15 +205,7 @@ export default function Navbar() {
             </li>
           ))}
 
-          <li className="pt-4 border-t border-yellow-500/20">
-            <Link
-              to="/donations"
-              className="block text-base font-bold text-gray-300 py-3 px-4 hover:text-yellow-300 hover:bg-yellow-500/10 rounded-lg transition-all duration-300"
-            >
-              Donate
-            </Link>
-          </li>
-
+{/* 
           <li>
             <Link
               to="/auth"
@@ -221,7 +213,7 @@ export default function Navbar() {
             >
               Login / Register
             </Link>
-          </li>
+          </li> */}
         </ul>
       </div>
 

@@ -95,7 +95,7 @@ export default function DonationsPage() {
 
   return (
     <div className="min-h-screen bg-black text-gray-300 font-sans selection:bg-yellow-500 selection:text-black">
-      
+
       {/* HEADER / HERO */}
       <div className="relative bg-zinc-950 border-b border-yellow-500/20 py-20 px-6 text-center overflow-hidden">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10"></div>
@@ -115,14 +115,14 @@ export default function DonationsPage() {
 
       {/* MAIN CONTENT AREA */}
       <div className="max-w-7xl mx-auto px-6 py-16 grid lg:grid-cols-12 gap-12 items-start">
-        
+
         {/* LEFT COLUMN: IMPACT INFO */}
         <div className="lg:col-span-5 space-y-8 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div>
             <h2 className="text-3xl font-bold text-white mb-4">Why Give Back?</h2>
             <div className="w-16 h-1 bg-yellow-500 mb-6"></div>
             <p className="text-gray-400 leading-relaxed mb-8">
-              Every shilling invested in the Nambale Magnet Alumni Network goes directly towards bridging the educational gap for brilliant but vulnerable children. 
+              Every shilling invested in the Nambale Magnet Alumni Network goes directly towards bridging the educational gap for brilliant but vulnerable children.
             </p>
           </div>
 
@@ -162,13 +162,12 @@ export default function DonationsPage() {
             {/* DYNAMIC ALERT MESSAGE - Dark Mode Optimized */}
             {status.msg && (
               <div
-                className={`mb-8 p-4 rounded-xl text-sm font-bold flex items-center gap-3 border backdrop-blur-sm animate-fade-in ${
-                  status.type === "success"
+                className={`mb-8 p-4 rounded-xl text-sm font-bold flex items-center gap-3 border backdrop-blur-sm animate-fade-in ${status.type === "success"
                     ? "bg-green-950/40 text-green-400 border-green-900/50"
                     : status.type === "error"
-                    ? "bg-red-950/40 text-red-400 border-red-900/50"
-                    : "bg-yellow-950/40 text-yellow-500 border-yellow-900/50"
-                }`}
+                      ? "bg-red-950/40 text-red-400 border-red-900/50"
+                      : "bg-yellow-950/40 text-yellow-500 border-yellow-900/50"
+                  }`}
               >
                 {status.type === "success" && <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>}
                 {status.type === "error" && <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>}
@@ -211,7 +210,7 @@ export default function DonationsPage() {
               {/* Amount Selection */}
               <div>
                 <label className="text-xs uppercase tracking-widest font-bold text-gray-400 ml-1">Select or Enter Amount (KES)</label>
-                
+
                 {/* Quick Select Buttons */}
                 <div className="grid grid-cols-4 gap-3 mt-3 mb-3">
                   {presetAmounts.map((amt) => (
@@ -219,11 +218,10 @@ export default function DonationsPage() {
                       key={amt}
                       type="button"
                       onClick={() => handlePresetClick(amt)}
-                      className={`py-2 rounded-lg text-sm font-bold border transition-all ${
-                        Number(form.amount) === amt 
-                          ? "bg-yellow-500 border-yellow-500 text-black" 
+                      className={`py-2 rounded-lg text-sm font-bold border transition-all ${Number(form.amount) === amt
+                          ? "bg-yellow-500 border-yellow-500 text-black"
                           : "bg-zinc-900 border-zinc-800 text-gray-400 hover:border-yellow-500/50 hover:text-yellow-500"
-                      }`}
+                        }`}
                     >
                       {amt.toLocaleString()}
                     </button>
@@ -313,7 +311,8 @@ export default function DonationsPage() {
       </footer>
 
       {/* Global Styles for Animations */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes fade-in-up {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }

@@ -48,20 +48,20 @@ const AdminLogin = () => {
 
   return (
     <div className="relative min-h-screen flex justify-center items-center bg-slate-900 overflow-hidden font-sans selection:bg-pink-500 selection:text-white mt-[-5rem] pt-4">
-      
+
       {/* 🌌 Futuristic Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[120px] animate-pulse-slow"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-pink-600/30 rounded-full blur-[120px] animate-pulse-slow delay-1000"></div>
-       <div className="absolute inset-0 bg-slate-900/[0.03] bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
+        <div className="absolute inset-0 bg-slate-900/[0.03] bg-[radial-gradient(#ffffff33_1px,transparent_1px)] [background-size:20px_20px] opacity-20"></div>
       </div>
 
       {/* 🛡️ Login Card (Glassmorphism) */}
       <div className="relative z-10 w-full max-w-md px-6">
-        
+
         {/* Back to Home Button */}
-        <button 
-          onClick={handleHome} 
+        <button
+          onClick={handleHome}
           className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm font-medium"
         >
           <div className="p-2 bg-slate-800 rounded-full group-hover:bg-slate-700 transition-colors">
@@ -71,13 +71,13 @@ const AdminLogin = () => {
         </button>
 
         <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 sm:p-10 rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative overflow-hidden">
-          
+
           {/* Subtle Card Top Glow */}
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-pink-500"></div>
 
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner border border-slate-700">
-               <ShieldCheck className="w-8 h-8 text-pink-400" />
+              <ShieldCheck className="w-8 h-8 text-pink-400" />
             </div>
             <h2 className="text-3xl font-black text-white tracking-tight">
               Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-400">Portal</span>
