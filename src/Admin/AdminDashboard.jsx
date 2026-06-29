@@ -23,7 +23,8 @@ const AdminDashboard = () => {
   };
 
   const navItems = [
-    { to: "users", label: "Visitor Details", icon: <Users className="w-5 h-5" /> },
+    { to: "users", label: "Manage Users", icon: <Users className="w-5 h-5" /> },
+    { to: "visitors", label: "Visitor Analytics", icon: <LayoutDashboard className="w-5 h-5" /> },
 
     { to: "alumni", label: "Manage Alumni Directory", icon: <Users className="w-5 h-5" /> },
     { to: "gallery", label: "Manage Gallery", icon: <ImageIcon className="w-5 h-5" /> },

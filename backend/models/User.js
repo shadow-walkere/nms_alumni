@@ -1,21 +1,34 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  username: {
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  email: {
     type: String,
     required: true,
     unique: true,
+    trim: true,
+    lowercase: true,
   },
   password: {
     type: String,
     required: true,
   },
-  role: {
+  year: {
+    type: Number,
+    required: true,
+  },
+  profession: {
     type: String,
-    default: 'admin',
+    trim: true,
+  },
+  isApproved: {
+    type: Boolean,
+    default: false,
   }
 }, { timestamps: true });
 
-const User = mongoose.model('User', userSchema);
-
-export default User;
+module.exports = mongoose.model('AlumniUser', userSchema);

@@ -15,8 +15,12 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   useEffect(() => {
     setIsOpen(false);
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
   }, [location.pathname]);
 
   const handleMouseMove = (e) => {
@@ -108,40 +112,69 @@ export default function Navbar() {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-4 pl-6 border-l border-yellow-500/20">
-            <Link
-              to="/auth"
-              className="relative group px-6 py-2.5 rounded-full text-sm font-extrabold overflow-hidden transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-yellow-400/40"
-            >
-              {/* Gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-300 group-hover:from-yellow-300 group-hover:to-yellow-400" />
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.href = "/";
+                }}
+                className="relative group px-6 py-2.5 rounded-full text-sm font-extrabold overflow-hidden transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-red-500/40"
+              >
+                {/* Gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 transition-all duration-300 group-hover:from-red-400 group-hover:to-red-500" />
+                <span className="relative text-white flex items-center gap-2">
+                  Logout
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                </span>
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="relative group px-6 py-2.5 rounded-full text-sm font-extrabold overflow-hidden transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-yellow-400/40"
+              >
+                {/* Gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-300 group-hover:from-yellow-300 group-hover:to-yellow-400" />
 
-              {/* Animated shine effect */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"
-                  style={{
-                    animation: "shimmer 2s infinite",
-                  }}
-                />
-              </div>
-
-              <span className="relative text-black flex items-center gap-2">
-                Login
-                <svg
-                  className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
+                {/* Animated shine effect */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"
+                    style={{
+                      animation: "shimmer 2s infinite",
+                    }}
                   />
-                </svg>
-              </span>
-            </Link>
+                </div>
+
+                <span className="relative text-black flex items-center gap-2">
+                  Login
+                  <svg
+                    className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                </span>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -205,15 +238,28 @@ export default function Navbar() {
             </li>
           ))}
 
-{/* 
-          <li>
-            <Link
-              to="/auth"
-              className="block bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-8 py-3 rounded-full font-extrabold w-full hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-400/50"
-            >
-              Login / Register
-            </Link>
-          </li> */}
+          {isLoggedIn ? (
+            <li className="pt-4 border-t border-yellow-500/10">
+              <button
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  window.location.href = "/";
+                }}
+                className="block bg-gradient-to-r from-red-500 to-red-600 text-white px-8 py-3 rounded-full font-extrabold w-full hover:from-red-400 hover:to-red-500 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/50 text-center"
+              >
+                Logout
+              </button>
+            </li>
+          ) : (
+            <li className="pt-4 border-t border-yellow-500/10">
+              <Link
+                to="/auth"
+                className="block bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-8 py-3 rounded-full font-extrabold w-full hover:from-yellow-300 hover:to-yellow-400 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-400/50"
+              >
+                Login / Register
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
 

@@ -139,4 +139,67 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Middleware to verify admin token for protected routes
+const verifyAdmin = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.admin = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+// @route   GET /api/admin/users
+// @desc    Get all registered users for admin dashboard approval workflow
+router.get('/users', verifyAdmin, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json({ success: true, data: users });
+  } catch (error) {
+    console.error("Get users error:", error);
+    res.status(500).json({ message: "Server error fetching users" });
+  }
+});
+
+// @route   PUT /api/admin/users/:id/approve
+// @desc    Approve a registered user account
+router.put('/users/:id/approve', verifyAdmin, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.isApproved = true;
+    await user.save();
+    res.json({ success: true, message: "User approved successfully", data: user });
+  } catch (error) {
+    console.error("Approve user error:", error);
+    res.status(500).json({ message: "Server error approving user" });
+  }
+});
+
+// @route   DELETE /api/admin/users/:id
+// @desc    Delete or reject a user account
+router.delete('/users/:id', verifyAdmin, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ message: "Server error deleting user" });
+  }
+});
+
 module.exports = router;

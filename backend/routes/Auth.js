@@ -20,22 +20,23 @@ router.post('/signup', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create and save the new user
+    // Create and save the new user (isApproved defaults to false)
     user = new User({
       name,
       email,
       password: hashedPassword,
-      year,
-      profession
+      year: parseInt(year),
+      profession,
+      isApproved: false
     });
 
     await user.save();
 
-    // Generate Auth Token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-    res.status(201).json({ message: "Account created successfully!", token });
+    res.status(201).json({ 
+      message: "Account created successfully! Please wait for admin approval before logging in." 
+    });
   } catch (err) {
+    console.error("Signup error:", err);
     res.status(500).json({ message: "Server error during registration." });
   }
 });
@@ -57,11 +58,17 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
 
+    // Verify account approval status
+    if (!user.isApproved) {
+      return res.status(403).json({ message: "Your account is pending admin approval." });
+    }
+
     // Generate Auth Token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
     res.json({ message: "Login successful!", token });
   } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ message: "Server error during login." });
   }
 });

@@ -44,8 +44,8 @@ export default function Auth() {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         
-        // Optional: Redirect user after successful login
-        // setTimeout(() => navigate("/"), 1500); 
+        // Redirect user after successful login
+        setTimeout(() => navigate("/alumni"), 1000); 
       }
 
     } catch (err) {

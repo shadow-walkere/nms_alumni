@@ -90,6 +90,7 @@ const bcrypt = require('bcryptjs');
 const Admin = require('./models/Admin');
 
 // Route Files
+const authRoutes = require('./routes/Auth');
 const adminRoutes = require('./routes/AdminRoutes');
 const visitorRoutes = require('./routes/VisitorRoutes');
 const galleryRoutes = require('./routes/GalleryRoute');
@@ -106,8 +107,9 @@ const allowedOrigins = [
   "http://localhost:3000",                     // Local dev (React)
   "http://localhost:3001",
   "http://localhost:3002",
+  "http://localhost:3003",
+  "http://localhost:3004",
   "https://nms-alumni.onrender.com",           // Your deployed frontend
-
 ];
 
 app.use(
@@ -130,6 +132,7 @@ app.use(express.json());
 
 // Mount Routes
 
+app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/visitors', visitorRoutes);
 app.use('/api/gallery', galleryRoutes);

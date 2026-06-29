@@ -25,6 +25,7 @@ import ManageEvents from "./Admin/ManageEvents";
 import UsersDetails from "./Admin/UsersDetails";
 import ManageAlumni from "./Admin/ManageAlumni";
 import AdminFAQs from "./Admin/AdminFAQs";
+import ManageUsers from "./Admin/ManageUsers";
 // import AdminTestimonials from "./Admin/AdminTestimonials";
 
 /* ─────────────────────────────────────────────────────────
@@ -113,7 +114,14 @@ function App() {
           
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/events" element={<NewsEvents />} />
-          <Route path="/alumni" element={<AlumniDirectory />} />
+          <Route
+            path="/alumni"
+            element={
+              <ProtectedRoute>
+                <AlumniDirectory />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected user route */}
           <Route
@@ -148,7 +156,7 @@ function App() {
             These render inside the <Outlet /> of AdminDashboard.
             Their URLs will be "/admin/dashboard/gallery", "/admin/dashboard/users", etc. 
           */}
-          <Route path="users" element={<UsersDetails />} />
+          <Route path="users" element={<ManageUsers />} />
           <Route path="visitors" element={<UsersDetails />} />
           <Route path="gallery" element={<ManageGallery />} />
            <Route path="events" element={<ManageEvents />} />
