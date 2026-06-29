@@ -186,6 +186,24 @@ router.put('/users/:id/approve', verifyAdmin, async (req, res) => {
   }
 });
 
+// @route   PUT /api/admin/users/:id/revoke
+// @desc    Revoke/un-approve a registered user account
+router.put('/users/:id/revoke', verifyAdmin, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.isApproved = false;
+    await user.save();
+    res.json({ success: true, message: "User access revoked successfully", data: user });
+  } catch (error) {
+    console.error("Revoke user error:", error);
+    res.status(500).json({ message: "Server error revoking user access" });
+  }
+});
+
 // @route   DELETE /api/admin/users/:id
 // @desc    Delete or reject a user account
 router.delete('/users/:id', verifyAdmin, async (req, res) => {

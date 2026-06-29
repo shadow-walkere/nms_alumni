@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { UserCheck, Trash2, ShieldAlert, Loader2, Search } from "lucide-react";
+import { UserCheck, UserX, Trash2, ShieldAlert, Loader2, Search } from "lucide-react";
 import SERVER_URL from "../config";
 
 function ManageUsers() {
@@ -43,6 +43,21 @@ function ManageUsers() {
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to approve user");
+    }
+  };
+
+  const handleRevoke = async (id) => {
+    try {
+      const res = await axios.put(`${SERVER_URL}/api/admin/users/${id}/revoke`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data && res.data.success) {
+        toast.success("User access revoked successfully");
+        setUsers(users.map(u => u._id === id ? { ...u, isApproved: false } : u));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to revoke user access");
     }
   };
 
@@ -168,7 +183,15 @@ function ManageUsers() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right space-x-2">
-                      {!user.isApproved && (
+                      {user.isApproved ? (
+                        <button
+                          onClick={() => handleRevoke(user._id)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-black hover:bg-amber-400 transition-colors font-bold text-xs"
+                        >
+                          <UserX size={14} />
+                          Revoke
+                        </button>
+                      ) : (
                         <button
                           onClick={() => handleApprove(user._id)}
                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500 text-black hover:bg-emerald-400 transition-colors font-bold text-xs"
